@@ -1,0 +1,20 @@
+{
+  "name": "derwins8a.github.io",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next --turbopack",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "next": "16.1.6",
+    "nextra": "4.6.1",
+    "nextra-theme-blog": "4.6.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  }
+}

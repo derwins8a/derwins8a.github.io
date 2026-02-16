@@ -1,0 +1,9 @@
+# Force all text files to LF
+* text eol=lf
+
+# Explicitly treat binary files as binary so Git leaves them alone
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
