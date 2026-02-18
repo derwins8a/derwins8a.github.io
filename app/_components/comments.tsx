@@ -16,7 +16,7 @@ export const Comments: FC = () => {
       reactionsEnabled="1"
       emitMetadata="0"
       inputPosition="top"
-      theme="https://derwins8a.github.io/themes/giscus/custom_example.css"
+      theme="https://derwins8a.github.io/giscus/custom_example.css"
       lang="en"
       loading="lazy"
       strict="0"
