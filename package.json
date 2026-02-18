@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@base-ui/react": "^1.2.0",
+    "@giscus/react": "^3.1.0",
     "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/postcss": "^4.1.18",
     "class-variance-authority": "^0.7.1",

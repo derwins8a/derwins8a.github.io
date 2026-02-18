@@ -5,6 +5,8 @@ import { Footer } from './footer'
 import { Navbar } from './navbar'
 import { Sidebar } from './sidebar'
  
+import { Comments } from './comments'
+
 export const NextraTheme: FC<{
   children: ReactNode
   pageMap: PageMapItem[]
@@ -21,6 +23,7 @@ export const NextraTheme: FC<{
         <Sidebar pageMap={pageMap} />
         {children}
       </div>
+      <Comments />
       <Footer />
     </>
   )
