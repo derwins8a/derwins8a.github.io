@@ -1,14 +1,12 @@
 import type { MDXComponents } from 'mdx/types'
 import { useMDXComponents as getNextraComponents } from 'nextra/mdx-components'
-import { TOC } from './app/_components/toc'
 
 const defaultComponents = getNextraComponents({
-  wrapper({ children, toc }: any) {
+  wrapper({ children }: any) {
     return (
-      <>
-        <div style={{ flexGrow: 1, padding: 20 }}>{children}</div>
-        <TOC toc={toc} />
-      </>
+      <div className="w-full mt-24 mb-16 prose prose-neutral dark:prose-invert max-w-none">
+        {children}
+      </div>
     )
   }
 })

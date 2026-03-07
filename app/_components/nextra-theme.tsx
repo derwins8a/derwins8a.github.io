@@ -1,30 +1,19 @@
 import type { PageMapItem } from 'nextra'
-import { version } from 'nextra/package.json'
 import type { FC, ReactNode } from 'react'
 import { Footer } from './footer'
 import { Navbar } from './navbar'
-import { Sidebar } from './sidebar'
- 
-import { Comments } from './comments'
 
 export const NextraTheme: FC<{
   children: ReactNode
   pageMap: PageMapItem[]
 }> = ({ children, pageMap }) => {
   return (
-    <>
-      <h1
-        className="text-3xl font-bold underline"
-      >
-        DERWINS OCHOA
-      </h1>
-      <Navbar pageMap={pageMap} />
-      <div style={{ display: 'flex' }}>
-        <Sidebar pageMap={pageMap} />
+    <div className="min-h-screen flex flex-col font-sans bg-background text-foreground">
+      <Navbar />
+      <main className="flex-grow max-w-4xl mx-auto w-full px-6 py-8">
         {children}
-      </div>
-      <Comments />
+      </main>
       <Footer />
-    </>
+    </div>
   )
 }

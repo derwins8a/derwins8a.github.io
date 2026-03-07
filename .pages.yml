@@ -1,0 +1,68 @@
+media:
+  input: public
+  output: /
+
+collections:
+  - name: blog
+    label: Blog
+    path: content/blog
+    format: frontmatter-mdx
+    fields:
+      - name: title
+        type: string
+        label: Title
+        required: true
+      - name: date
+        type: date
+        label: Date
+        required: true
+      - name: description
+        type: string
+        label: Description
+      - name: tags
+        type: list
+        label: Tags
+      - name: featured
+        type: boolean
+        label: Featured
+      - name: image
+        type: image
+        label: Cover Image
+      - name: body
+        type: rich-text
+        label: Body
+
+  - name: projects
+    label: Projects
+    path: content/projects
+    format: frontmatter-mdx
+    fields:
+      - name: title
+        type: string
+        label: Title
+        required: true
+      - name: date
+        type: date
+        label: Date
+        required: true
+      - name: description
+        type: string
+        label: Description
+      - name: tags
+        type: list
+        label: Tags
+      - name: featured
+        type: boolean
+        label: Featured
+      - name: image
+        type: image
+        label: Cover Image
+      - name: link
+        type: string
+        label: External Link
+      - name: github
+        type: string
+        label: GitHub Repository
+      - name: body
+        type: rich-text
+        label: Body
