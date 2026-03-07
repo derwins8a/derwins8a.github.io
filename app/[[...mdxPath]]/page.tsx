@@ -22,7 +22,7 @@ export default async function Page(props: any) {
   } = await importPage(params.mdxPath)
 
   const isBlogArticle = params.mdxPath && params.mdxPath[0] === 'blog' && params.mdxPath.length > 1
-  const showComments = isBlogArticle && metadata?.comments !== false
+  const showComments = isBlogArticle && (metadata as any)?.comments !== false
 
   return (
     <Wrapper toc={toc} metadata={metadata} sourceCode={sourceCode}>
