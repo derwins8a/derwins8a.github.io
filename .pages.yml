@@ -1,27 +1,40 @@
+actions:
+  - name: deploy-site
+    label: Deploy site
+    workflow: deploy.yml
+    confirm:
+      title: Deploy site?
+      message: This will trigger the deployment workflow.
+      button: Deploy
+
 media:
   input: public
   output: /
 
-collections:
+content:
   - name: blog
     label: Blog
+    type: collection
     path: content/blog
-    format: frontmatter-mdx
+    format: yaml-frontmatter
     fields:
       - name: title
         type: string
         label: Title
         required: true
-      - name: date
+      - name: originally_written
         type: date
-        label: Date
-        required: true
+        label: Originally Written
+      - name: last_edited
+        type: date
+        label: Last Edited
       - name: description
         type: string
         label: Description
       - name: tags
-        type: list
+        type: string
         label: Tags
+        list: true
       - name: featured
         type: boolean
         label: Featured
@@ -34,8 +47,9 @@ collections:
 
   - name: projects
     label: Projects
+    type: collection
     path: content/projects
-    format: frontmatter-mdx
+    format: yaml-frontmatter
     fields:
       - name: title
         type: string
@@ -49,8 +63,9 @@ collections:
         type: string
         label: Description
       - name: tags
-        type: list
+        type: string
         label: Tags
+        list: true
       - name: featured
         type: boolean
         label: Featured
