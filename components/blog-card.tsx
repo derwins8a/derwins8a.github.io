@@ -1,6 +1,6 @@
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
 import { StructuredPage, PageFrontmatter } from "@/lib/portfolio"
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr"
 
 export function BlogCard({ article }: { article: StructuredPage }) {
   const fm = (article.frontMatter || {}) as PageFrontmatter
@@ -14,33 +14,44 @@ export function BlogCard({ article }: { article: StructuredPage }) {
     : null
 
   return (
-    <div className="flex flex-col h-full bg-secondary/5 border-l-4 border-foreground p-6 hover:bg-secondary/10 transition-colors">
-      <div className="flex flex-col gap-1 mb-4">
-        <Link href={article.route} className="hover:underline decoration-2 underline-offset-4">
-          <h3 className="text-2xl font-bold tracking-tight text-foreground/90">
+    <div className="flex flex-col h-full bg-card border border-border/60 dark:border-white/[0.08] hover:border-[#007AFF]/40 rounded-[28px] p-6 transition-all duration-300 group shadow-lg select-none">
+      <Link href={article.route} className="flex flex-col h-full gap-4">
+        
+        {/* Title & Date Header */}
+        <div className="flex flex-col gap-1.5 text-left">
+          {formattedDate && (
+            <span className="text-xs text-[#007AFF] font-medium tracking-tight lowercase">
+              {formattedDate.toLowerCase()}
+            </span>
+          )}
+          <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-[#007AFF] transition-colors leading-snug lowercase">
             {fm.title || article.name}
           </h3>
-        </Link>
-        {formattedDate && (
-          <span className="text-sm font-medium text-muted-foreground italic">
-            published {formattedDate}
-          </span>
+        </div>
+
+        {/* Description */}
+        {fm.description && (
+          <p className="text-sm text-muted-foreground leading-relaxed font-normal lowercase line-clamp-3">
+            {fm.description}
+          </p>
         )}
-      </div>
 
-      <div className="w-full flex justify-end gap-2 mb-4">
-        {fm.tags && fm.tags.map((tag: string) => (
-          <Badge key={tag} variant="outline" className="text-xs rounded-none border-foreground/20 font-normal">
-            {tag.toLowerCase()}
-          </Badge>
-        ))}
-      </div>
+        {/* Bottom Row: Tags & Read Button */}
+        <div className="mt-auto pt-4 flex items-center justify-between gap-2 border-t border-border/30">
+          <div className="flex flex-wrap gap-1.5">
+            {fm.tags && fm.tags.map((tag: string) => (
+              <span key={tag} className="text-[11px] text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full lowercase">
+                {tag.toLowerCase()}
+              </span>
+            ))}
+          </div>
 
-      {fm.description && (
-        <p className="text-muted-foreground leading-relaxed">
-          {fm.description}
-        </p>
-      )}
+          <span className="text-xs text-foreground/80 group-hover:text-foreground flex items-center gap-1 font-medium lowercase">
+            read essay
+            <ArrowRight size={12} weight="bold" />
+          </span>
+        </div>
+      </Link>
     </div>
   )
 }

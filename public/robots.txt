@@ -1,0 +1,26 @@
+# robots.txt for derwins8a.github.io
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /giscus/
+
+# Block known aggressive scrapers and spam harvester bots
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: EmailCollector
+Disallow: /
+
+User-agent: EmailSiphon
+Disallow: /
+
+User-agent: EmailWolf
+Disallow: /
+
+User-agent: WebBandit
+Disallow: /
+
+Sitemap: https://derwins8a.github.io/sitemap.xml

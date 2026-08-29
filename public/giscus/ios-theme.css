@@ -1,0 +1,168 @@
+/*!
+ * Apple iOS 26 Theme for Giscus Comments
+ */
+
+main {
+  /* Light Mode Palette (Default) */
+  --color-canvas-default: transparent;
+  --color-canvas-overlay: rgba(255, 255, 255, 0.95);
+  --color-canvas-inset: rgba(0, 0, 0, 0.03);
+  --color-canvas-subtle: rgba(0, 0, 0, 0.02);
+  
+  --color-fg-default: #1d1d1f;
+  --color-fg-muted: #6e6e73;
+  --color-fg-subtle: #86868b;
+  
+  --color-border-default: rgba(0, 0, 0, 0.08);
+  --color-border-muted: rgba(0, 0, 0, 0.05);
+  
+  --color-accent-fg: #0071e3;
+  --color-accent-emphasis: #0071e3;
+  --color-accent-muted: rgba(0, 113, 227, 0.4);
+  --color-accent-subtle: rgba(0, 113, 227, 0.1);
+  
+  --color-btn-text: #1d1d1f;
+  --color-btn-bg: rgba(0, 0, 0, 0.04);
+  --color-btn-border: rgba(0, 0, 0, 0.08);
+  --color-btn-hover-bg: rgba(0, 0, 0, 0.08);
+  --color-btn-hover-border: rgba(0, 0, 0, 0.12);
+  
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-bg: #0071e3;
+  --color-btn-primary-border: #0071e3;
+  --color-btn-primary-hover-bg: #0077ed;
+  --color-btn-primary-hover-border: #0077ed;
+  
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Geist", sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Base Card Resets - iOS Squircles */
+.gsc-comment-box {
+  border-radius: 24px !important;
+  border: 1px solid var(--color-border-default) !important;
+  background: var(--color-canvas-inset) !important;
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  margin-bottom: 2rem !important;
+}
+
+.gsc-comment-box-textarea {
+  border: none !important;
+  background: transparent !important;
+  padding: 16px !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  border-radius: 0 !important;
+}
+
+.gsc-comment-box-tabs {
+  border-bottom: 1px solid var(--color-border-default) !important;
+  padding: 8px 12px 0 !important;
+  background: rgba(0, 0, 0, 0.01);
+}
+
+.gsc-comment-box-tab {
+  border-radius: 9999px !important;
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  padding: 6px 14px !important;
+  text-transform: lowercase;
+  border: none !important;
+}
+
+.gsc-comment-box-tab[aria-selected="true"] {
+  background: var(--color-accent-fg) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
+.gsc-comment-box-buttons {
+  padding: 12px 16px !important;
+  border-top: 1px solid var(--color-border-default) !important;
+}
+
+.gsc-button,
+.gsc-comment-box-buttons button {
+  border-radius: 9999px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 8px 18px !important;
+  text-transform: lowercase;
+  transition: all 0.2s ease !important;
+}
+
+.gsc-comment {
+  border-radius: 24px !important;
+  border: 1px solid var(--color-border-default) !important;
+  background: var(--color-canvas-inset) !important;
+  margin-bottom: 1.25rem !important;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+}
+
+.gsc-comment-header {
+  padding: 12px 18px !important;
+  border-bottom: 1px solid var(--color-border-default) !important;
+  background: rgba(0, 0, 0, 0.01) !important;
+}
+
+.gsc-comment-content {
+  padding: 18px !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+.gsc-reply-button {
+  border-radius: 9999px !important;
+  font-size: 12px !important;
+  text-transform: lowercase;
+}
+
+.gsc-reactions-button,
+.gsc-social-reaction-summary-item {
+  border-radius: 9999px !important;
+  border: 1px solid var(--color-border-default) !important;
+  background: var(--color-canvas-subtle) !important;
+  font-size: 12px !important;
+}
+
+/* Dark Mode Palette */
+@media (prefers-color-scheme: dark) {
+  main {
+    --color-canvas-default: transparent;
+    --color-canvas-overlay: rgba(28, 28, 30, 0.95);
+    --color-canvas-inset: rgba(28, 28, 30, 0.7);
+    --color-canvas-subtle: rgba(44, 44, 46, 0.5);
+    
+    --color-fg-default: #f5f5f7;
+    --color-fg-muted: #8e8e93;
+    --color-fg-subtle: #636366;
+    
+    --color-border-default: rgba(255, 255, 255, 0.08);
+    --color-border-muted: rgba(255, 255, 255, 0.05);
+    
+    --color-accent-fg: #007AFF;
+    --color-accent-emphasis: #007AFF;
+    --color-accent-muted: rgba(0, 122, 255, 0.4);
+    --color-accent-subtle: rgba(0, 122, 255, 0.15);
+    
+    --color-btn-text: #f5f5f7;
+    --color-btn-bg: rgba(44, 44, 46, 0.8);
+    --color-btn-border: rgba(255, 255, 255, 0.08);
+    --color-btn-hover-bg: rgba(58, 58, 60, 0.9);
+    --color-btn-hover-border: rgba(255, 255, 255, 0.15);
+    
+    --color-btn-primary-text: #ffffff;
+    --color-btn-primary-bg: #007AFF;
+    --color-btn-primary-border: #007AFF;
+    --color-btn-primary-hover-bg: #0071e3;
+    --color-btn-primary-hover-border: #0071e3;
+  }
+
+  .gsc-comment-box,
+  .gsc-comment {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  }
+}

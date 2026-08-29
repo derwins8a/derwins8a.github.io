@@ -1,0 +1,35 @@
+---
+title: oklch color builder
+originally_written: 2026-05-12
+last_edited: 2026-05-20
+description: a premium, interactive color palette designer utilizing the oklch color space for generating accessible web color systems.
+tags: [typescript, react, design, colors]
+featured: true
+github: https://github.com/derwins8a/oklch-palette-builder
+link: https://derwins8a.github.io/oklch-palette-builder
+---
+
+this is an interactive web tool built to help designers and engineers create harmonized, accessible color systems using the modern **oklch color space**.
+
+unlike traditional rgb or hsl models, oklch represents color based on human visual perception, making it much easier to predict contrast, lightness, and chroma across screen displays.
+
+---
+
+## key features.
+
+- **perceptually uniform**: scaling lightness remains perceptually constant across all hues, ensuring consistent color weight.
+- **wcag contrast audits**: instant contrast ratio calculation against dark and light background values.
+- **tailwind css export**: exports variables directly into css `@theme` and custom properties.
+
+```ts
+// oklch to rgb conversion helper
+export function oklchToCss(l: number, c: number, h: number): string {
+  return `oklch(${l.toFixed(3)} ${c.toFixed(3)} ${h.toFixed(1)})`
+}
+```
+
+---
+
+## tech stack & implementation.
+
+built entirely using **react**, **tailwind css v4**, and custom canvas components to visualize chroma gamut boundaries.
