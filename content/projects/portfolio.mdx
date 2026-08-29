@@ -1,21 +1,37 @@
 ---
-title: Building this Portfolio Website
-date: 2026-03-01
-description: A deep dive into how I built this portfolio using Nextra 4, Next.js App Router, and Shadcn UI.
-tags: [Next.js, React, Tailwind]
+title: building this portfolio website
+originally_written: 2026-03-01
+last_edited: 2026-08-28
+description: a deep dive into how i built this portfolio using nextra 4, next.js app router, and shadcn ui.
+tags: [next.js, react, tailwind, typescript]
 featured: true
 github: https://github.com/derwins8a/nextra-derwins8a
 link: https://derwins8a.github.io
 ---
 
-# Building this Portfolio
+this portfolio was built using modern web technologies focused on minimalism, performance, and iOS-inspired tactile design.
 
-This portfolio was built using exciting new technologies!
+---
 
-- **Nextra 4** with Next.js App Router for MDX rendering.
-- **Tailwind CSS** for rapid styling.
-- **Shadcn UI** for accessible and beautiful components.
+## core architecture.
 
-### Implementation Setup
+- **nextra 4**: leveraging next.js app router for dynamic, type-safe mdx page mapping.
+- **tailwind css v4**: modern styling engine with custom oklch color variables.
+- **phosphor icons**: clean, consistent icon set matching apple's sf symbols aesthetic.
 
-We integrated **Pages CMS** to seamlessly edit projects and blogs via the GitHub repository directly!
+```tsx
+// sample mdx layout wrapper
+export function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="max-w-4xl mx-auto px-6 py-8">
+      {children}
+    </main>
+  )
+}
+```
+
+---
+
+## implementation highlights.
+
+we integrated **pages cms** to seamlessly edit projects and blog essays directly through github. every interaction is tuned with spring physics and responsive states.

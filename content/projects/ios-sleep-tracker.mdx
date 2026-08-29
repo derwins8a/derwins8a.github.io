@@ -1,0 +1,40 @@
+---
+title: sleep. — iOS tracker
+originally_written: 2026-04-20
+last_edited: 2026-04-25
+description: a minimal swiftui application focusing on sleep health, combining clean iOS typography with physics-based gesture navigation.
+tags: [swiftui, ios, mobile, swift]
+featured: true
+github: https://github.com/derwins8a/sleep-tracker
+---
+
+*sleep.* is a native iOS sleep journal application designed to reduce screen stimulation before bed. it strips away complex data metrics to focus on simplicity, tracking sleep duration and quality through tactile interaction.
+
+---
+
+## UI/UX highlights.
+
+- **interactive sheets**: modal panels that slide up from the bottom with native spring physics.
+- **dark-mode first**: a warm, low-contrast dark palette to protect eyes during nighttime usage.
+- **tactile dials**: log sleep sessions with a single circular slider interaction rather than typing numbers.
+
+```swift
+// sample swiftui gesture handler
+struct SleepDialView: View {
+    @State private var sleepHours: Double = 8.0
+    
+    var body: some View {
+        VStack {
+            Text("\(sleepHours, specifier: "%.1f") hrs")
+                .font(.system(.title, design: .rounded))
+                .fontWeight(.bold)
+        }
+    }
+}
+```
+
+---
+
+## tech stack & framework.
+
+built using **swiftui** and **swift 6**, leveraging **swiftdata** for local, private persistence and syncing with **icloud**.

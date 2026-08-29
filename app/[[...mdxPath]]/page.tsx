@@ -25,7 +25,7 @@ export default async function Page(props: any) {
   const showComments = isBlogArticle && (metadata as any)?.comments !== false
 
   return (
-    <Wrapper toc={toc} metadata={metadata} sourceCode={sourceCode}>
+    <Wrapper toc={toc} metadata={metadata} sourceCode={sourceCode} mdxPath={params.mdxPath}>
       <MDXContent {...props} params={params} />
       {showComments && <Comments />}
     </Wrapper>

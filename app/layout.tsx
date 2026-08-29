@@ -18,8 +18,33 @@ export const metadata: Metadata = {
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
   const pageMap = await getPageMap()
   return (
-    <html lang="en" dir="ltr" className={geist.variable}>
-      <Head faviconGlyph="✦" />
+    <html lang="en" dir="ltr" className={geist.variable} suppressHydrationWarning>
+      <Head faviconGlyph="✦">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const theme = localStorage.getItem('theme');
+                if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.setAttribute('data-theme', 'dark');
+                } else if (theme === 'light') {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.setAttribute('data-theme', 'light');
+                } else {
+                  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                    document.documentElement.setAttribute('data-theme', 'light');
+                  }
+                }
+              } catch (e) {}
+            `,
+          }}
+        />
+      </Head>
       <body style={{ margin: 0 }}>
         <NextraTheme pageMap={pageMap}>{children}</NextraTheme>
       </body>
