@@ -227,8 +227,8 @@ export const Navbar = () => {
               style={{
                 transform: `translateX(${pillPosition.x}px)`,
                 width: pillPosition.width,
-                '--pill-x': `${pillPosition.x}px`,
-              }}
+                ['--pill-x']: `${pillPosition.x}px`,
+              } as React.CSSProperties}
               aria-hidden="true"
             >
               {/* Inner glow effect */}
@@ -327,8 +327,8 @@ export const Navbar = () => {
               )}
               style={{
                 transform: `translateX(${mobilePillPosition}px)`,
-                '--pill-x': `${mobilePillPosition}px`,
-              }}
+                ['--pill-x']: `${mobilePillPosition}px`,
+              } as React.CSSProperties}
               aria-hidden
             >
               <div className="absolute inset-0 rounded-full" style={{
