@@ -709,6 +709,79 @@ export function ContactInfo() {
   )
 }
 
+/* ─── FAQ Section (Schema.org FAQPage) ─── */
+export function FAQSection() {
+  const faqs = [
+    {
+      question: "What is a design engineer?",
+      answer: "A design engineer bridges the gap between design and engineering. I don't just implement designs — I make architectural decisions about interactions, motion, typography, and color systems that shape how a product feels. I write production code (React, Next.js, SwiftUI) while owning the design system, component library, and frontend architecture.",
+    },
+    {
+      question: "What does 'derwins8a' mean?",
+      answer: "derwins8a is my unified digital identity across all platforms (GitHub, LinkedIn, Twitter/X, Instagram, YouTube). My full name is Derwins Ochoa — known in networks as derwins8a. Using both together (Derwins Ochoa @derwins8a) consolidates my identity for search engines and AI crawlers.",
+    },
+    {
+      question: "What technologies do you specialize in?",
+      answer: "I specialize in TypeScript, React 19, Next.js, SwiftUI, Tailwind CSS v4, and OKLCH color space. My stack includes Radix UI, shadcn/ui, and custom design system tooling. I build for the web (Next.js) and native iOS/visionOS (SwiftUI) with shared design tokens.",
+    },
+    {
+      question: "Do you work with early-stage startups?",
+      answer: "I work exclusively with established brands and funded startups (Series A+) where craft, performance, and accessibility are non-negotiable. I don't take on MVP-only projects or equity-only arrangements. Minimum engagement is $25k.",
+    },
+    {
+      question: "What's your approach to design systems?",
+      answer: "I build token-first design systems using OKLCH for perceptually uniform color, semantic naming, and platform-agnostic tokens that compile to CSS, iOS, and Android. Components are built with Radix UI primitives, fully typed, tested, and documented. The system scales without drifting.",
+    },
+    {
+      question: "How do you handle animations and motion?",
+      answer: "Motion is functional, not decorative. I use spring physics (cubic-bezier(0.34, 1.56, 0.64, 1)) for natural feel, respect prefers-reduced-motion, and leverage View Transitions API, CSS scroll-driven animations, and SwiftUI's native springs. Every animation communicates state change.",
+    },
+    {
+      question: "Where are you based?",
+      answer: "I'm based in Venezuela and work remotely with clients globally (US, EU, LatAm). Time zone overlap with Americas and Europe is comfortable for async + sync collaboration.",
+    },
+    {
+      question: "What's your availability?",
+      answer: "Currently taking on new projects starting January 2027. Limited slots — book early via the contact page. I respond to inquiries within 24 hours.",
+    },
+  ]
+
+  return (
+    <section className="py-14 w-full text-left" aria-labelledby="faq-heading" itemScope itemType="https://schema.org/FAQPage">
+      <div className="mb-8">
+        <p className="text-[11px] font-bold text-muted-foreground/50 uppercase tracking-[0.14em] mb-2">FAQ</p>
+        <h2 id="faq-heading" className="text-2xl md:text-3xl font-extrabold tracking-tight text-foreground lowercase">
+          frequently asked questions.
+        </h2>
+        <p className="text-muted-foreground mt-4 max-w-2xl font-light leading-relaxed lowercase">
+          direct answers about how i work, what i build, and who i am.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {faqs.map(({ question, answer }, idx) => (
+          <article
+            key={question}
+            itemScope
+            itemType="https://schema.org/Question"
+            className="scroll-slide-up flex flex-col gap-3 card-surface grain relative rounded-[22px] p-5 overflow-hidden transition-all duration-300 hover:border-primary/30 hover:shadow-lg"
+            style={{ animationDelay: `${idx * 40}ms` }}
+          >
+            <h3 itemProp="name" className="text-base font-bold tracking-tight text-foreground leading-snug">
+              {question}
+            </h3>
+            <div itemScope itemProp="acceptedAnswer" itemType="https://schema.org/Answer">
+              <p itemProp="text" className="text-sm text-muted-foreground leading-relaxed font-light lowercase">
+                {answer}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 /* ─── Availability Section ─── */
 export function AvailabilitySection() {
   return (
