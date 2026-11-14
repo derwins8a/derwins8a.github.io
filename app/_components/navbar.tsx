@@ -37,31 +37,48 @@ export const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [activeIndex, setActiveIndex] = useState(0)
-  const [pillPosition, setPillPosition] = useState({ x: 0, width: 0 })
+  const [pillPosition, setPillPosition] = useState({ x: -9999, width: 0 })
   const [isPillAnimating, setIsPillAnimating] = useState(false)
-  const [mobilePillPosition, setMobilePillPosition] = useState(0)
+  const [mobilePillPosition, setMobilePillPosition] = useState(-9999)
   const prevTabIdx = useRef<number>(0)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const navRef = useRef<HTMLElement>(null)
   const mobileNavRef = useRef<HTMLElement>(null)
   const mobileLinkRefs = useRef<(HTMLAnchorElement | HTMLButtonElement | null)[]>([])
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([])
+  const isMounted = useRef(false)
 
-  // Determine active tab index
-  const getActiveIndex = useCallback((path: string) => {
+  // Determine active tab index for mobile (0-based, matches mobileTabs)
+  const getMobileActiveIndex = useCallback((path: string) => {
     if (path === '/') return 0
     if (path === '/about') return 1
     if (path.startsWith('/projects')) return 2
     if (path.startsWith('/blog')) return 3
     if (path.startsWith('/contact')) return 4
-    return 0
+    return -1 // No active tab for unknown paths
   }, [])
 
   // Mobile active index (derived from pathname)
-  const mobileActiveIndex = getActiveIndex(pathname)
+  const mobileActiveIndex = getMobileActiveIndex(pathname)
+
+  // Determine active index for desktop pill (offset by 1 for logo)
+  const getDesktopActiveIndex = useCallback((path: string) => {
+    const mobileIdx = getMobileActiveIndex(path)
+    if (mobileIdx === -1) return -1
+    return mobileIdx + 1 // Offset by 1 since logo is at index 0
+  }, [getMobileActiveIndex])
+
+  // Desktop active index (for pill animation)
+  const desktopActiveIndex = getDesktopActiveIndex(pathname)
 
   // Update pill position with fluid spring animation (desktop)
   const updatePillPosition = useCallback((index: number) => {
+    // If index is -1 (unknown page), hide the pill by moving it off-screen
+    if (index === -1) {
+      setPillPosition({ x: -9999, width: 0 })
+      return
+    }
+
     if (!navRef.current || !linkRefs.current[index]) return
 
     const nav = navRef.current
@@ -85,6 +102,12 @@ export const Navbar = () => {
 
   // Update mobile pill position
   const updateMobilePillPosition = useCallback((index: number) => {
+    // If index is -1 (unknown page), hide the pill
+    if (index === -1) {
+      setMobilePillPosition(-9999)
+      return
+    }
+
     if (!mobileNavRef.current || !mobileLinkRefs.current[index]) return
 
     const nav = mobileNavRef.current
@@ -98,31 +121,40 @@ export const Navbar = () => {
     setMobilePillPosition(x)
   }, [])
 
+  // Initialize pill position on mount
+  useEffect(() => {
+    isMounted.current = true
+    const desktopIdx = getDesktopActiveIndex(pathname)
+    const mobileIdx = getMobileActiveIndex(pathname)
+    setActiveIndex(mobileIdx)
+
+    // Defer to after first render for proper measurements
+    requestAnimationFrame(() => {
+      updatePillPosition(desktopIdx)
+      updateMobilePillPosition(mobileIdx)
+    })
+  }, [getDesktopActiveIndex, getMobileActiveIndex, updatePillPosition, updateMobilePillPosition])
+
   // Update pill positions on pathname change
   useEffect(() => {
-    const newIndex = getActiveIndex(pathname)
-    setActiveIndex(newIndex)
+    if (!isMounted.current) return
+
+    const desktopIdx = getDesktopActiveIndex(pathname)
+    const mobileIdx = getMobileActiveIndex(pathname)
+    setActiveIndex(mobileIdx)
 
     requestAnimationFrame(() => {
-      updatePillPosition(newIndex)
-      updateMobilePillPosition(newIndex)
+      updatePillPosition(desktopIdx)
+      updateMobilePillPosition(mobileIdx)
     })
-  }, [pathname, getActiveIndex, updatePillPosition, updateMobilePillPosition])
+  }, [pathname, getDesktopActiveIndex, getMobileActiveIndex, updatePillPosition, updateMobilePillPosition])
 
   // Desktop active link helper
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href)
 
-  // Handle pathname changes
-  useEffect(() => {
-    const newIndex = getActiveIndex(pathname)
-    setActiveIndex(newIndex)
-
-    // Update pill position after render
-    requestAnimationFrame(() => {
-      updatePillPosition(newIndex)
-    })
-  }, [pathname, getActiveIndex, updatePillPosition])
+  // Check if current page is a known nav page
+  const isKnownPage = mobileActiveIndex !== -1
 
   // Scroll effect
   useEffect(() => {
@@ -184,26 +216,28 @@ export const Navbar = () => {
           )}
           aria-label="Main navigation"
         >
-          {/* Fluid Liquid Pill - iOS 26 Style */}
-          <div
-            className={cn(
-              "absolute top-1 bottom-1 rounded-full pointer-events-none z-0",
-              "bg-primary shadow-[0_8px_24px_oklch(0.6_0.22_250_/0.4),0_2px_8px_oklch(0.6_0.22_250_/0.3)]",
-              "transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-              isPillAnimating && "animate-pill-bounce"
-            )}
-            style={{
-              transform: `translateX(${pillPosition.x}px)`,
-              width: pillPosition.width,
-            }}
-            aria-hidden="true"
-          >
-            {/* Inner glow effect */}
-            <div className="absolute inset-0 rounded-full" style={{
-              background: 'linear-gradient(to bottom, oklch(1 0 0 / 0.25), oklch(0 0 0 / 0%))',
-              boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.3), inset 0 -1px 0 oklch(0 0 0 / 0.1)',
-            }} />
-          </div>
+          {/* Fluid Liquid Pill - iOS 26 Style (only show on known pages) */}
+          {isKnownPage && (
+            <div
+              className={cn(
+                "absolute top-1 bottom-1 rounded-full pointer-events-none z-0 pill-spring",
+                "bg-primary shadow-[0_8px_24px_oklch(0.6_0.22_250_/0.4),0_2px_8px_oklch(0.6_0.22_250_/0.3)]",
+                isPillAnimating && "animate-pill-bounce"
+              )}
+              style={{
+                transform: `translateX(${pillPosition.x}px)`,
+                width: pillPosition.width,
+                '--pill-x': `${pillPosition.x}px`,
+              }}
+              aria-hidden="true"
+            >
+              {/* Inner glow effect */}
+              <div className="absolute inset-0 rounded-full" style={{
+                background: 'linear-gradient(to bottom, oklch(1 0 0 / 0.25), oklch(0 0 0 / 0%))',
+                boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.3), inset 0 -1px 0 oklch(0 0 0 / 0.1)',
+              }} />
+            </div>
+          )}
 
           {/* Logo / Monogram */}
           <Link
@@ -220,24 +254,28 @@ export const Navbar = () => {
           <span className="relative z-10 w-px h-5 bg-border mx-1 opacity-60" aria-hidden />
 
           {/* Nav Links with Icons */}
-          {desktopLinks.map(({ href, label, icon: Icon }, idx) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => handleLinkClick(idx)}
-              ref={(el) => { linkRefs.current[idx] = el }}
-              className={cn(
-                "relative z-10 flex items-center gap-1.5 px-3.5 h-9 rounded-full text-sm font-medium transition-all duration-200",
-                isActive(href)
-                  ? "text-primary-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              aria-current={isActive(href) ? 'page' : undefined}
-            >
-              <Icon size={14} weight={isActive(href) ? "fill" : "regular"} aria-hidden />
-              <span className="lowercase">{label}</span>
-            </Link>
-          ))}
+          {desktopLinks.map(({ href, label, icon: Icon }, idx) => {
+            const active = isActive(href) && isKnownPage
+            const refIndex = idx + 1 // Offset by 1 since logo is at index 0
+            return (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => handleLinkClick(refIndex)}
+                ref={(el) => { linkRefs.current[refIndex] = el }}
+                className={cn(
+                  "relative z-10 flex items-center gap-1.5 px-3.5 h-9 rounded-full text-sm font-medium transition-all duration-200",
+                  active
+                    ? "text-primary-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                aria-current={active ? 'page' : undefined}
+              >
+                <Icon size={14} weight={active ? "fill" : "regular"} aria-hidden />
+                <span className="lowercase">{label}</span>
+              </Link>
+            )
+          })}
 
           {/* Separator */}
           <span className="relative z-10 w-px h-5 bg-border mx-1 opacity-60" aria-hidden />
@@ -255,7 +293,7 @@ export const Navbar = () => {
       </header>
 
       {/* ══════════════════════════════════════
-          MOBILE — Bottom Tab Bar (iOS 26 Style)
+          MOBILE — Bottom Pill Nav (iOS 26 Style)
       ══════════════════════════════════════ */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom select-none">
         {/* Gradient fade above the bar */}
@@ -269,39 +307,46 @@ export const Navbar = () => {
         <nav
           ref={mobileNavRef}
           className={cn(
-            "relative flex items-center justify-around px-2 pt-2 pb-safe-or-2",
-            "glass border-t border-border/40",
+            "relative flex items-center justify-around px-3 pb-safe-or-2",
+            "glass",
+            isKnownPage ? "border-t border-border/40" : "border-t border-border/40",
           )}
-          style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}
+          style={{
+            paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+            margin: '0 12px 8px 12px',
+            borderRadius: '9999px',
+          }}
           aria-label="Mobile navigation"
         >
           {/* Mobile fluid pill - iOS 26 liquid glass */}
-          <div
-            className={cn(
-              "absolute top-2 bottom-2 rounded-2xl pointer-events-none z-0",
-              "bg-primary/15 shadow-[0_4px_16px_oklch(0.6_0.22_250_/0.3),0_1px_4px_oklch(0.6_0.22_250_/0.2)]",
-              "transition-all duration-400 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-            )}
-            style={{
-              transform: `translateX(${mobilePillPosition}px)`,
-            }}
-            aria-hidden
-          >
-            <div className="absolute inset-0 rounded-2xl" style={{
-              background: 'linear-gradient(to bottom, oklch(1 0 0 / 0.2), oklch(0 0 0 / 0%))',
-              boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.15)',
-            }} />
-          </div>
+          {isKnownPage && (
+            <div
+              className={cn(
+                "absolute top-1.5 bottom-1.5 rounded-full pointer-events-none z-0 pill-spring",
+                "bg-primary/20 shadow-[0_4px_16px_oklch(0.6_0.22_250_/0.35),0_1px_4px_oklch(0.6_0.22_250_/0.25)]",
+              )}
+              style={{
+                transform: `translateX(${mobilePillPosition}px)`,
+                '--pill-x': `${mobilePillPosition}px`,
+              }}
+              aria-hidden
+            >
+              <div className="absolute inset-0 rounded-full" style={{
+                background: 'linear-gradient(to bottom, oklch(1 0 0 / 0.25), oklch(0 0 0 / 0%))',
+                boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.2), inset 0 -1px 0 oklch(0 0 0 / 0.1)',
+              }} />
+            </div>
+          )}
 
           {mobileTabs.map(({ href, label, icon: Icon }, idx) => {
-            const active = idx === mobileActiveIndex
+            const active = idx === mobileActiveIndex && isKnownPage
             return (
               <Link
                 key={href}
                 href={href}
                 ref={(el) => { mobileLinkRefs.current[idx] = el }}
                 className={cn(
-                  "relative z-10 flex flex-col items-center gap-0.5 min-w-0 flex-1 py-1.5 rounded-2xl transition-all duration-200",
+                  "relative z-10 flex flex-col items-center gap-0.5 min-w-0 flex-1 py-2.5 rounded-full transition-all duration-200",
                   active ? "text-primary" : "text-muted-foreground hover:text-foreground",
                 )}
                 aria-current={active ? 'page' : undefined}
@@ -325,7 +370,7 @@ export const Navbar = () => {
           <button
             onClick={() => setIsSearchOpen(true)}
             ref={(el) => { mobileLinkRefs.current[5] = el }}
-            className="relative z-10 flex flex-col items-center gap-0.5 min-w-0 flex-1 py-1.5 rounded-2xl text-muted-foreground hover:text-foreground transition-all"
+            className="relative z-10 flex flex-col items-center gap-0.5 min-w-0 flex-1 py-2.5 rounded-full text-muted-foreground hover:text-foreground transition-all"
             aria-label="Search"
           >
             <MagnifyingGlass size={22} weight="regular" aria-hidden />

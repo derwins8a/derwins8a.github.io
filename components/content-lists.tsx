@@ -18,14 +18,12 @@ export async function BlogList() {
 export async function ProjectList() {
   const projects = await getCollection("/projects")
   const projectNodes = projects.map(item => <ProjectCard key={item.route} project={item} />)
-  
+
   return (
-    <div className="mt-8">
-      <PaginatedList 
-        items={projectNodes} 
-        pageSize={6}
-        gridClassName="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-      />
-    </div>
+    <PaginatedList
+      items={projectNodes}
+      pageSize={6}
+      gridClassName="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+    />
   )
 }

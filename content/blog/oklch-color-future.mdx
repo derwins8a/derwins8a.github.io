@@ -1,0 +1,95 @@
+---
+title: oklch is the future of web color
+date: 2026-09-20
+originally_written: 2026-09-20
+last_edited: 2026-10-05
+description: why the oklch color space produces more consistent, accessible, and visually harmonious palettes than hex or hsl — and how to use it today.
+tags: [design, css, color]
+featured: true
+---
+
+the web has been stuck with `rgb` and `hsl` for decades. but there is a better way.
+
+---
+
+## the problem with hsl.
+
+`hsl` feels intuitive — hue, saturation, lightness. but it has a fundamental flaw: **perceptual non-uniformity**.
+
+a yellow at `50%` lightness *looks* far brighter than a blue at the same `50%`. this means every color system built on hsl lies to you. your "balanced" neutral palette is not balanced.
+
+try it yourself:
+
+```css
+/* These look very different despite identical lightness */
+hsl(60, 90%, 50%)  /* yellow — blindingly bright */
+hsl(240, 90%, 50%) /* blue   — muted and dark */
+```
+
+---
+
+## enter oklch.
+
+`oklch` is the perceptually uniform alternative. it is built on the oklab color space, which models how the human visual system actually perceives color.
+
+- **L** — perceived lightness (0 to 1)
+- **C** — chroma (colorfulness, 0 to 0.4+)
+- **H** — hue angle (0 to 360)
+
+```css
+/* Same perceived lightness, different hues */
+oklch(0.6 0.22 250) /* blue  — same brightness as: */
+oklch(0.6 0.18 140) /* green */
+oklch(0.6 0.20 30)  /* orange */
+```
+
+all three *actually look* the same brightness to the human eye.
+
+---
+
+## building a palette.
+
+this site's color system uses `oklch` throughout. the primary blue is:
+
+```css
+--primary: oklch(0.6 0.22 250);
+```
+
+to create accessible variants, i simply adjust lightness:
+
+```css
+/* Light mode */
+--primary-50:  oklch(0.95 0.04 250); /* Near white */
+--primary-500: oklch(0.60 0.22 250); /* Base */
+--primary-900: oklch(0.25 0.14 250); /* Near black */
+
+/* They all pass WCAG contrast — because the lightness is real */
+```
+
+---
+
+## dark mode without hacks.
+
+dark mode in hsl is painful — you end up hand-tuning every color. in oklch, you can often just shift lightness:
+
+```css
+:root      { --bg: oklch(0.98 0.002 85); }
+.dark      { --bg: oklch(0.10 0.006 265); }
+```
+
+the perceptual consistency means your contrast ratios stay predictable.
+
+---
+
+## use it now.
+
+oklch is supported in all modern browsers. start today:
+
+```css
+body {
+  background: oklch(0.98 0.002 85);
+  color: oklch(0.11 0.012 265);
+}
+```
+
+> oklch is not a trend. it is the correct tool for the job. your design system will thank you.

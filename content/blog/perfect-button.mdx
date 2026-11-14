@@ -1,0 +1,129 @@
+---
+title: the anatomy of a perfect button
+date: 2026-10-15
+originally_written: 2026-10-15
+last_edited: 2026-10-28
+description: a deep dive into what makes a button feel premium — from padding ratios to spring physics press states and accessibility semantics.
+tags: [design, frontend, accessibility]
+featured: true
+---
+
+a button seems simple. it is not.
+
+there are hundreds of micro-decisions embedded in a great button: the padding ratio, the press physics, the disabled state, the focus ring, the icon alignment. get any of them wrong and users unconsciously lose trust in your product.
+
+---
+
+## 1. the perfect padding ratio.
+
+the golden rule: horizontal padding should be ~2.5× the vertical padding for most text buttons. this creates optical balance.
+
+```css
+/* This feels right */
+padding: 10px 24px; /* 2.4× ratio */
+
+/* This feels stubby */
+padding: 10px 14px; /* 1.4× ratio */
+```
+
+for icon+text buttons, reduce horizontal padding slightly to compensate for the visual weight of the icon.
+
+---
+
+## 2. the press state: spring physics.
+
+a button that squishes on press creates haptic-like tactile feedback even on a glass screen.
+
+```css
+.btn {
+  transition: transform 0.15s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.btn:hover  { transform: scale(1.03) translateY(-1px); }
+.btn:active { transform: scale(0.97); }
+```
+
+the `cubic-bezier(0.34, 1.2, 0.64, 1)` creates a subtle overshoot on hover — a spring-like bounce that feels alive.
+
+avoid `0.4s` transitions on press states. the interaction must feel **instant** (`<120ms`).
+
+---
+
+## 3. the inset highlight.
+
+premium ui has a subtle top highlight that simulates light hitting the top edge of the button — a nod to physical materiality.
+
+```css
+.btn-primary {
+  box-shadow:
+    0 4px 14px oklch(0.6 0.22 250 / 30%),  /* Colored ambient shadow */
+    inset 0 1px 0 oklch(1 0 0 / 20%);       /* Top highlight */
+}
+```
+
+this small detail is the difference between "flat" and "premium". apple uses it in every button, every card.
+
+---
+
+## 4. the disabled state.
+
+a disabled button must clearly communicate non-interactivity without being cruel about it.
+
+```css
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+```
+
+never use `pointer-events: none` alone — always also set `cursor: not-allowed` and ensure screen readers hear `aria-disabled="true"`.
+
+---
+
+## 5. the focus ring.
+
+the focus ring is not an ugly browser artifact to hide. it is a critical accessibility feature.
+
+```css
+.btn:focus-visible {
+  outline: 2px solid oklch(0.6 0.22 250);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+```
+
+use `:focus-visible` (not `:focus`) so mouse users never see the ring, but keyboard users always do.
+
+---
+
+## the full button.
+
+```tsx
+<button
+  className="
+    relative overflow-hidden
+    px-6 h-12 rounded-full
+    bg-primary text-primary-foreground
+    text-sm font-semibold tracking-tight
+    transition-all duration-150 ease-[cubic-bezier(0.34,1.2,0.64,1)]
+    hover:scale-[1.03] hover:-translate-y-px
+    active:scale-[0.97]
+    focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2
+    disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none
+  "
+  style={{
+    boxShadow: '0 4px 14px oklch(0.6 0.22 250 / 28%), inset 0 1px 0 oklch(1 0 0 / 18%)'
+  }}
+>
+  {/* Inner gradient for depth */}
+  <span
+    className="absolute inset-0 rounded-full pointer-events-none"
+    style={{ background: 'linear-gradient(to bottom, oklch(1 0 0 / 12%), oklch(0 0 0 / 0%))' }}
+    aria-hidden
+  />
+  send email.
+</button>
+```
+
+> every pixel is intentional. every millisecond is deliberate. that is what premium feels like.

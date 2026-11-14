@@ -14,12 +14,12 @@ export function BlogCard({ article }: { article: StructuredPage }) {
     : null
 
   return (
-    <article className="scroll-slide-up flex flex-col h-full card-surface grain relative rounded-[24px] p-6 transition-all duration-300 group select-none overflow-hidden">
-      <Link href={article.route} className="flex flex-col h-full gap-4">
+    <article className="scroll-slide-up flex flex-col h-full card-surface grain relative rounded-[24px] p-5 transition-all duration-300 group select-none overflow-hidden">
+      <Link href={article.route} className="flex flex-col h-full gap-3">
 
         {/* Date + read time */}
         {formattedDate && (
-          <div className="flex items-center gap-1.5 text-primary">
+          <div className="flex items-center gap-1.5 text-primary/90">
             <CalendarBlank size={12} weight="bold" aria-hidden />
             <span className="text-xs font-semibold tracking-tight lowercase">
               {formattedDate.toLowerCase()}
@@ -34,13 +34,13 @@ export function BlogCard({ article }: { article: StructuredPage }) {
 
         {/* Description */}
         {fm.description && (
-          <p className="text-sm text-muted-foreground leading-relaxed font-normal lowercase line-clamp-3 flex-grow">
+          <p className="text-sm text-muted-foreground/90 leading-relaxed font-normal lowercase line-clamp-3 flex-grow">
             {fm.description}
           </p>
         )}
 
         {/* Bottom row */}
-        <div className="flex items-center justify-between gap-2 mt-auto pt-4 border-t border-border/30">
+        <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-border/30">
           <div className="flex flex-wrap gap-1.5">
             {fm.tags && fm.tags.slice(0, 2).map((tag: string) => (
               <span key={tag} className="chip">
@@ -49,7 +49,7 @@ export function BlogCard({ article }: { article: StructuredPage }) {
             ))}
           </div>
 
-          <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors lowercase shrink-0">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground/90 group-hover:text-primary transition-colors lowercase shrink-0">
             read essay
             <ArrowRight size={12} weight="bold" aria-hidden />
           </span>

@@ -15,7 +15,7 @@ export const NextraTheme: FC<{
       <Navbar />
 
       {/* Main content — padded for desktop pill nav top + mobile bottom tab bar */}
-      <main className="flex-grow max-w-4xl mx-auto w-full px-5 md:px-6 pt-24 md:pt-20 pb-28 md:pb-20">
+      <main className="flex-grow max-w-4xl mx-auto w-full px-5 md:px-6 pt-20 md:pt-16 pb-16 md:pb-12">
         {children}
       </main>
 

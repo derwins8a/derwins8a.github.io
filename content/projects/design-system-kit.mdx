@@ -1,0 +1,73 @@
+---
+title: design system kit
+date: 2026-08-15
+originally_written: 2026-08-15
+last_edited: 2026-10-20
+description: an open-source design token system and component kit built for next.js and tailwind css v4, using oklch for perceptual color consistency.
+tags: [design-system, nextjs, tailwind, typescript]
+featured: true
+github: https://github.com/derwins8a/design-system-kit
+---
+
+a production-ready design token foundation and component kit for next.js applications. built from first principles — no bloated dependencies, no magic.
+
+---
+
+## the problem this solves.
+
+most design systems accumulate debt quickly. tokens drift. dark mode is an afterthought. components grow booleans. by the time you realize it, you have 47 `isBlue` props and three different `button` components that nobody dares delete.
+
+this kit establishes the invariants from day one:
+- **semantic tokens** that map correctly in both light and dark mode
+- **perceptual color** using oklch so your palette is actually consistent
+- **composition over configuration** — extend, don't override
+
+---
+
+## architecture.
+
+```
+design-system-kit/
+  tokens/
+    colors.css      — oklch semantic tokens
+    spacing.css     — 4/8dp rhythm
+    typography.css  — fluid type scale
+    shadows.css     — elevation tokens with skeuomorphic highlights
+  components/
+    button/
+    card/
+    input/
+    badge/
+  utils/
+    cn.ts           — className merger
+    tokens.ts       — typed token accessors
+```
+
+---
+
+## color tokens example.
+
+```css
+:root {
+  /* Primitive */
+  --blue-500: oklch(0.60 0.22 250);
+  --blue-400: oklch(0.70 0.20 250);
+  --blue-600: oklch(0.50 0.22 250);
+
+  /* Semantic */
+  --color-primary:          var(--blue-500);
+  --color-primary-hover:    var(--blue-400);
+  --color-primary-pressed:  var(--blue-600);
+}
+
+.dark {
+  /* Same semantics, shifted primitives */
+  --blue-500: oklch(0.65 0.22 250); /* Slightly brighter in dark */
+}
+```
+
+---
+
+## tech stack.
+
+built using **next.js 16**, **tailwind css v4**, **typescript**, **radix ui**, and **shadcn/ui** as the component primitive layer.

@@ -28,9 +28,9 @@ export const Comments: FC = () => {
   }, [])
 
   return (
-    <div className="mt-20 pt-10 border-t border-border/40 w-full text-left">
-      <div className="mb-8">
-        <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground lowercase">
+    <div className="mt-16 pt-8 border-t border-border/40 w-full text-left">
+      <div className="mb-6">
+        <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground lowercase">
           comments.
         </h3>
         <p className="text-xs text-muted-foreground lowercase mt-1">
@@ -42,18 +42,18 @@ export const Comments: FC = () => {
         <Giscus
           id="comments"
           repo="derwins8a/derwins8a.github.io"
-          repoId="R_kgDOQAzThg="
+          repoId="R_kgDOQAzThg"
           category="Announcements"
           categoryId="DIC_kwDOQAzThs4C2qzK"
           mapping="pathname"
-          term="Welcome to @giscus/react component!"
+          strict="0"
           reactionsEnabled="1"
           emitMetadata="0"
           inputPosition="top"
           theme="https://derwins8a.github.io/giscus/ios-theme.css"
           lang="en"
           loading="lazy"
-          strict="0"
+          crossorigin="anonymous"
         />
       )}
     </div>
