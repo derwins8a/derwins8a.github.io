@@ -1,61 +1,83 @@
 import Link from "next/link"
 import { StructuredPage, PageFrontmatter } from "@/lib/portfolio"
 import Image from "next/image"
-import { ArrowRight } from "@phosphor-icons/react/dist/ssr"
+import { ArrowRight, Code } from "@phosphor-icons/react/dist/ssr"
 
 export function ProjectCard({ project }: { project: StructuredPage }) {
   const fm = (project.frontMatter || {}) as PageFrontmatter
 
   return (
-    <div className="flex flex-col h-full bg-card border border-border/60 dark:border-white/[0.08] hover:border-[#007AFF]/40 rounded-[32px] p-5 transition-all duration-300 group shadow-lg select-none">
-      <Link href={project.route} className="flex flex-col h-full gap-4">
-        {/* iOS Blue Rounded Media Container */}
-        <div className="relative w-full aspect-[16/10] bg-[#007AFF] rounded-[22px] overflow-hidden shadow-inner flex items-center justify-center">
+    <article className="scroll-slide-up flex flex-col h-full card-surface grain relative rounded-[28px] overflow-hidden transition-all duration-300 group select-none">
+      <Link href={project.route} className="flex flex-col h-full">
+        {/* Media container */}
+        <div className="relative w-full aspect-[16/10] overflow-hidden shrink-0">
           {fm.image ? (
             <Image
               src={fm.image}
               alt={fm.title || project.name}
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-tr from-[#005bb5] via-[#007AFF] to-[#409cff] flex items-center justify-center p-6 text-center">
-              <span className="text-white font-bold text-lg tracking-tight lowercase line-clamp-2">
-                {fm.title || project.name}
-              </span>
+            <div
+              className="w-full h-full flex items-center justify-center p-6 text-center"
+              style={{
+                background: 'linear-gradient(135deg, oklch(0.68 0.22 250) 0%, oklch(0.5 0.22 250) 100%)',
+              }}
+            >
+              {/* Subtle dot pattern overlay */}
+              <div
+                className="absolute inset-0 opacity-10"
+                style={{
+                  backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)',
+                  backgroundSize: '20px 20px',
+                }}
+                aria-hidden
+              />
+              <Code size={36} weight="thin" className="text-white/80 relative z-10" aria-hidden />
             </div>
           )}
+
+          {/* Top gradient overlay for legibility */}
+          <div
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            style={{ background: 'linear-gradient(to top, oklch(0 0 0 / 20%) 0%, transparent 60%)' }}
+            aria-hidden
+          />
         </div>
 
-        {/* Card Content */}
-        <div className="flex flex-col flex-grow gap-2 px-1">
-          <h3 className="text-xl font-bold tracking-tight text-foreground group-hover:text-[#007AFF] transition-colors leading-snug lowercase">
-            {fm.title || project.name}
-          </h3>
+        {/* Content */}
+        <div className="flex flex-col flex-grow gap-2.5 p-5">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-base font-bold tracking-tight text-foreground group-hover:text-primary transition-colors leading-snug lowercase line-clamp-2">
+              {fm.title || project.name}
+            </h3>
+            <span
+              className="size-7 rounded-xl bg-muted border border-border flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:border-primary group-hover:text-primary-foreground transition-all duration-200 shrink-0 mt-0.5"
+              aria-hidden
+            >
+              <ArrowRight size={13} weight="bold" />
+            </span>
+          </div>
 
           {fm.description && (
-            <p className="text-sm text-muted-foreground leading-relaxed font-normal lowercase line-clamp-3">
+            <p className="text-sm text-muted-foreground leading-relaxed font-normal lowercase line-clamp-2">
               {fm.description}
             </p>
           )}
 
-          {/* Bottom Row: Tags & iOS Pill Button */}
-          <div className="mt-auto pt-4 flex items-center justify-between gap-2">
-            <div className="flex flex-wrap gap-1.5">
-              {fm.tags && fm.tags.slice(0, 2).map((tag: string) => (
-                <span key={tag} className="text-[11px] text-muted-foreground bg-muted px-2.5 py-1 rounded-full lowercase font-medium">
+          {fm.tags && fm.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-auto pt-3">
+              {fm.tags.slice(0, 3).map((tag: string) => (
+                <span key={tag} className="chip">
                   {tag.toLowerCase()}
                 </span>
               ))}
             </div>
-
-            <span className="bg-[#007AFF] hover:bg-[#0071e3] text-white text-xs font-semibold px-4 py-2 rounded-full shadow-md transition-all flex items-center gap-1 lowercase shrink-0">
-              read more.
-              <ArrowRight size={12} weight="bold" />
-            </span>
-          </div>
+          )}
         </div>
       </Link>
-    </div>
+    </article>
   )
 }

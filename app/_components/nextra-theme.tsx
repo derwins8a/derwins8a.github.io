@@ -2,20 +2,24 @@ import type { PageMapItem } from 'nextra'
 import type { FC, ReactNode } from 'react'
 import { Footer } from './footer'
 import { Navbar } from './navbar'
-import { IOSDock } from '@/components/ios-dock'
 
 export const NextraTheme: FC<{
   children: ReactNode
   pageMap: PageMapItem[]
 }> = ({ children, pageMap }) => {
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-background text-foreground selection:bg-[#007AFF]/30 selection:text-white transition-colors duration-300">
+    <div className="min-h-screen flex flex-col font-sans bg-background text-foreground selection:bg-primary/20 transition-colors duration-300">
+      {/* Background mesh gradient */}
+      <div className="page-gradient" aria-hidden />
+
       <Navbar />
-      <main className="flex-grow max-w-4xl mx-auto w-full px-6 py-6 pb-20">
+
+      {/* Main content — padded for desktop pill nav top + mobile bottom tab bar */}
+      <main className="flex-grow max-w-4xl mx-auto w-full px-5 md:px-6 pt-24 md:pt-20 pb-28 md:pb-20">
         {children}
       </main>
+
       <Footer />
-      <IOSDock />
     </div>
   )
 }
