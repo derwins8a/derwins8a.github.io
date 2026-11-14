@@ -53,7 +53,6 @@ export const Comments: FC = () => {
           theme="https://derwins8a.github.io/giscus/ios-theme.css"
           lang="en"
           loading="lazy"
-          crossorigin="anonymous"
         />
       )}
     </div>
