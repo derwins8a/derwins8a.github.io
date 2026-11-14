@@ -36,15 +36,15 @@ const footerColumns = [
 export const Footer = () => {
   return (
     <footer className="w-full border-t border-border/20 mt-16 md:mt-24 bg-background-secondary select-none transition-colors duration-300">
-      {/* Top section */}
-      <div className="max-w-4xl mx-auto px-5 md:px-6 pt-14 pb-10">
+      {/* Top section - generous bottom padding on mobile (pb-28) to leave ample breathing room for the floating mobile pill nav */}
+      <div className="max-w-4xl mx-auto px-5 md:px-6 pt-14 pb-28 md:pb-12">
         {/* Brand row */}
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-8 mb-12">
           <div className="flex flex-col gap-3 max-w-xs">
             <Link href="/" className="font-extrabold tracking-tighter text-foreground text-xl uppercase hover:opacity-80 transition-opacity">
               Derwins Ochoa
             </Link>
-            <p className="text-sm text-muted-foreground font-light leading-relaxed lowercase">
+            <p className="text-sm text-foreground/75 font-light leading-relaxed lowercase">
               design engineer & frontend architect. building tactile, high-performance digital experiences.
             </p>
             {/* Social icons */}
@@ -60,7 +60,7 @@ export const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="size-9 rounded-xl bg-card border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-border-strong hover:scale-105 active:scale-95 transition-all shadow-sm"
+                  className="size-9 rounded-xl bg-card border border-border flex items-center justify-center text-foreground/75 hover:text-foreground hover:border-border-strong hover:scale-105 active:scale-95 transition-all shadow-xs"
                 >
                   <Icon size={16} weight="bold" aria-hidden />
                 </a>
@@ -72,7 +72,7 @@ export const Footer = () => {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 text-sm">
             {footerColumns.map(col => (
               <div key={col.heading} className="flex flex-col gap-3">
-                <span className="text-[10px] font-bold text-foreground/35 uppercase tracking-[0.12em]">
+                <span className="text-[10px] font-bold text-foreground/45 uppercase tracking-[0.12em]">
                   {col.heading}
                 </span>
                 <div className="flex flex-col gap-2.5">
@@ -83,7 +83,7 @@ export const Footer = () => {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-muted-foreground hover:text-foreground transition-colors lowercase link-underline w-fit"
+                        className="text-foreground/70 hover:text-foreground transition-colors lowercase link-underline w-fit"
                       >
                         {link.label}
                       </a>
@@ -91,14 +91,14 @@ export const Footer = () => {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="text-muted-foreground hover:text-foreground transition-colors lowercase link-underline w-fit"
+                        className="text-foreground/70 hover:text-foreground transition-colors lowercase link-underline w-fit"
                       >
                         {link.label}
                       </Link>
                     )
                   ))}
                   {col.extra && (
-                    <ProtectedEmailLink className="text-muted-foreground hover:text-foreground transition-colors lowercase link-underline w-fit cursor-pointer" />
+                    <ProtectedEmailLink className="text-foreground/70 hover:text-foreground transition-colors lowercase link-underline w-fit cursor-pointer" />
                   )}
                 </div>
               </div>
@@ -106,14 +106,16 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {/* Bottom bar: Copyright & Theme Toggle */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border/20">
-          <p className="text-xs text-muted-foreground/70 font-light lowercase flex items-center gap-1.5">
+          <p className="text-xs text-foreground/65 font-light lowercase flex items-center gap-1.5">
             © {new Date().getFullYear()} Derwins Ochoa · made with
             <Heart size={11} weight="fill" className="text-red-400 inline" aria-hidden />
             in Venezuela.
           </p>
-          <ThemeToggle />
+          <div className="flex items-center">
+            <ThemeToggle />
+          </div>
         </div>
       </div>
     </footer>

@@ -1,0 +1,92 @@
+/*!
+ * Apple HIG Theme for Giscus Comments
+ * Derwins Ochoa Portfolio
+ */
+
+main {
+  --color-canvas-default: #ffffff;
+  --color-canvas-overlay: #ffffff;
+  --color-canvas-inset: #f5f5f7;
+  --color-canvas-subtle: #f2f2f7;
+
+  --color-fg-default: #1d1d1f;
+  --color-fg-muted: #515154;
+  --color-fg-subtle: #86868b;
+
+  --color-border-default: rgba(0, 0, 0, 0.12);
+  --color-border-muted: rgba(0, 0, 0, 0.06);
+
+  --color-accent-fg: #0071e3;
+  --color-accent-emphasis: #0071e3;
+  --color-accent-muted: rgba(0, 113, 227, 0.4);
+  --color-accent-subtle: rgba(0, 113, 227, 0.1);
+
+  --color-btn-text: #1d1d1f;
+  --color-btn-bg: #f5f5f7;
+  --color-btn-border: rgba(0, 0, 0, 0.12);
+  --color-btn-hover-bg: #e5e5ea;
+  --color-btn-hover-border: rgba(0, 0, 0, 0.2);
+
+  --color-btn-primary-text: #ffffff;
+  --color-btn-primary-bg: #0071e3;
+  --color-btn-primary-border: #0071e3;
+  --color-btn-primary-hover-bg: #0077ed;
+  --color-btn-primary-hover-border: #0077ed;
+
+  color-scheme: light;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Geist", system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+@media (prefers-color-scheme: dark) {
+  main {
+    --color-canvas-default: #1c1c1e;
+    --color-canvas-overlay: #1c1c1e;
+    --color-canvas-inset: #2c2c2e;
+    --color-canvas-subtle: #242426;
+
+    --color-fg-default: #f5f5f7;
+    --color-fg-muted: #a1a1a6;
+    --color-fg-subtle: #636366;
+
+    --color-border-default: rgba(255, 255, 255, 0.1);
+    --color-border-muted: rgba(255, 255, 255, 0.06);
+
+    --color-accent-fg: #0a84ff;
+    --color-accent-emphasis: #0a84ff;
+    --color-accent-muted: rgba(10, 132, 255, 0.4);
+    --color-accent-subtle: rgba(10, 132, 255, 0.15);
+
+    --color-btn-text: #f5f5f7;
+    --color-btn-bg: #2c2c2e;
+    --color-btn-border: rgba(255, 255, 255, 0.1);
+    --color-btn-hover-bg: #3a3a3c;
+    --color-btn-hover-border: rgba(255, 255, 255, 0.18);
+
+    --color-btn-primary-text: #ffffff;
+    --color-btn-primary-bg: #0a84ff;
+    --color-btn-primary-border: #0a84ff;
+    --color-btn-primary-hover-bg: #0071e3;
+    --color-btn-primary-hover-border: #0071e3;
+
+    color-scheme: dark;
+  }
+}
+
+.gsc-header,
+.gsc-comments-count {
+  font-weight: 600 !important;
+}
+
+.gsc-comment-box,
+.gsc-comment {
+  border-radius: 20px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden !important;
+}
+
+.gsc-button,
+.gsc-comment-box-buttons button {
+  border-radius: 9999px !important;
+  font-weight: 600 !important;
+}

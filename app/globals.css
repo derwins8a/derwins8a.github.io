@@ -415,25 +415,11 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* Glass cursor - custom cursor with magnifying glass effect */
+  /* Glass cursor - hide system cursor on pointer-fine devices so our smooth <GlassCursor /> component handles all states */
   @media (pointer: fine) {
-    body {
-      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cdefs%3E%3Cfilter id='glass'%3E%3CfeGaussianBlur stdDeviation='0.5'/%3E%3C/filter%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23000' stroke-width='2' filter='url(%23glass)'/%3E%3C/svg%3E") 16 16, auto;
+    *, *::before, *::after {
+      cursor: none !important;
     }
-
-    .dark body {
-      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cdefs%3E%3Cfilter id='glass'%3E%3CfeGaussianBlur stdDeviation='0.5'/%3E%3C/filter%3E%3C/defs%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%23fff' stroke-width='2' filter='url(%23glass)'/%3E%3C/svg%3E") 16 16, auto;
-    }
-  }
-
-  /* Interactive elements keep default cursor */
-  a, button, input, textarea, select, [role="button"] {
-    cursor: pointer;
-  }
-
-  /* Text selection areas use text cursor */
-  p, h1, h2, h3, h4, h5, h6, li, blockquote, code, pre {
-    cursor: text;
   }
 }
 
@@ -529,18 +515,30 @@
   transform: scale(0.97);
 }
 
-/* ─── Scroll-driven animations (CSS only, no JS) ─── */
-@supports (animation-timeline: scroll()) {
-  .scroll-fade-in {
-    animation: scrollFadeIn linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 30%;
-  }
+/* ─── Motion & Animations ─── */
+.scroll-slide-up {
+  animation: enterFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
 
+.scroll-fade-in {
+  animation: fadeIn 0.5s ease-out backwards;
+}
+
+.scroll-scale-in {
+  animation: enterScaleIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+@supports (animation-timeline: view()) {
   .scroll-slide-up {
     animation: scrollSlideUp linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 25%;
+  }
+
+  .scroll-fade-in {
+    animation: scrollFadeIn linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 30%;
   }
 
   .scroll-scale-in {
@@ -715,6 +713,107 @@
   outline: 2px solid var(--ring);
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* ─── Ring utility for clickable elements (no cursor change, just ring on focus) ─── */
+.has-ring:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.ring-primary:focus-visible {
+  outline-color: var(--primary);
+}
+
+/* ─── Entrance Animations ─── */
+@keyframes enterFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes enterFadeDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes enterScaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes enterSlideRight {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes enterSlideLeft {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-enter-fade-up {
+  animation: enterFadeUp 0.5s cubic-bezier(0.32, 0.94, 0.6, 1) forwards;
+}
+
+.animate-enter-fade-down {
+  animation: enterFadeDown 0.5s cubic-bezier(0.32, 0.94, 0.6, 1) forwards;
+}
+
+.animate-enter-scale-in {
+  animation: enterScaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-enter-slide-right {
+  animation: enterSlideRight 0.5s cubic-bezier(0.32, 0.94, 0.6, 1) forwards;
+}
+
+.animate-enter-slide-left {
+  animation: enterSlideLeft 0.5s cubic-bezier(0.32, 0.94, 0.6, 1) forwards;
+}
+
+/* Stagger delays for children */
+.animate-stagger-1 { animation-delay: 0ms; }
+.animate-stagger-2 { animation-delay: 60ms; }
+.animate-stagger-3 { animation-delay: 120ms; }
+.animate-stagger-4 { animation-delay: 180ms; }
+.animate-stagger-5 { animation-delay: 240ms; }
+.animate-stagger-6 { animation-delay: 300ms; }
+
+/* ─── Hover Animations ─── */
+@keyframes hoverLift {
+  from { transform: translateY(0); }
+  to { transform: translateY(-2px); }
+}
+
+@keyframes hoverGlow {
+  from { box-shadow: var(--shadow-sm), var(--inset-highlight); }
+  to { box-shadow: var(--shadow-lg), var(--inset-highlight); }
+}
+
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.32, 0.94, 0.6, 1);
+}
+
+.hover-lift:hover {
+  animation: hoverLift 0.2s cubic-bezier(0.32, 0.94, 0.6, 1) forwards;
+}
+
+.hover-glow {
+  transition: box-shadow 0.2s cubic-bezier(0.32, 0.94, 0.6, 1);
+}
+
+.hover-glow:hover {
+  animation: hoverGlow 0.2s cubic-bezier(0.32, 0.94, 0.6, 1) forwards;
+}
+
+/* ─── Page Transition Classes ─── */
+.page-enter {
+  animation: enterFadeUp 0.4s cubic-bezier(0.32, 0.94, 0.6, 1) forwards;
+}
+
+.page-exit {
+  animation: fadeOut 0.2s ease-out forwards;
 }
 
 /* ─── Typography refinements ─── */
@@ -960,13 +1059,6 @@ code, pre, kbd, samp {
 .prose table { @apply w-full border-collapse mb-6; }
 .prose th, .prose td { @apply border border-border px-4 py-2 text-left; }
 .prose th { @apply bg-muted font-semibold; }
-
-/* ─── Focus Visible Enhancement ─── */
-*:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 3px;
-  border-radius: 6px;
-}
 
 /* ─── Selection ─── */
 ::selection {

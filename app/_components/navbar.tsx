@@ -14,7 +14,7 @@ import {
 } from "@phosphor-icons/react"
 import { cn } from '@/lib/utils'
 
-const desktopLinks = [
+const navTabs = [
   { href: '/',         label: 'home',     icon: House },
   { href: '/about',    label: 'about',    icon: User },
   { href: '/projects', label: 'projects', icon: FolderSimple },
@@ -22,154 +22,51 @@ const desktopLinks = [
   { href: '/contact',  label: 'contact',  icon: PaperPlaneTilt },
 ]
 
-const mobileTabs = [
-  { href: '/',         label: 'home',     icon: House },
-  { href: '/about',    label: 'about',    icon: User },
-  { href: '/projects', label: 'work',     icon: FolderSimple },
-  { href: '/blog',     label: 'blog',     icon: BookOpen },
-  { href: '/contact',  label: 'contact',  icon: PaperPlaneTilt },
-]
+const DESKTOP_TAB_WIDTH = 96 // px per tab on desktop
+const DESKTOP_PADDING = 4    // container padding
+const MOBILE_TAB_WIDTH = 54  // px per tab on mobile
+const MOBILE_PADDING = 4     // container padding
 
 export const Navbar = () => {
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [pillPosition, setPillPosition] = useState({ x: -9999, width: 0 })
-  const [isPillAnimating, setIsPillAnimating] = useState(false)
-  const [mobilePillPosition, setMobilePillPosition] = useState(-9999)
-  const prevTabIdx = useRef<number>(0)
+  const [isBouncing, setIsBouncing] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const navRef = useRef<HTMLElement>(null)
-  const mobileNavRef = useRef<HTMLElement>(null)
-  const mobileLinkRefs = useRef<(HTMLAnchorElement | HTMLButtonElement | null)[]>([])
-  const linkRefs = useRef<(HTMLAnchorElement | null)[]>([])
-  const isMounted = useRef(false)
+  const prevIndexRef = useRef<number>(-1)
 
-  // Determine active tab index for mobile (0-based, matches mobileTabs)
-  const getMobileActiveIndex = useCallback((path: string) => {
+  // Determine active index
+  const getActiveIndex = useCallback((path: string) => {
     if (path === '/') return 0
     if (path === '/about') return 1
     if (path.startsWith('/projects')) return 2
     if (path.startsWith('/blog')) return 3
     if (path.startsWith('/contact')) return 4
-    return -1 // No active tab for unknown paths
+    return -1
   }, [])
 
-  // Mobile active index (derived from pathname)
-  const mobileActiveIndex = getMobileActiveIndex(pathname)
+  const activeIndex = getActiveIndex(pathname)
 
-  // Determine active index for desktop pill (offset by 1 for logo)
-  const getDesktopActiveIndex = useCallback((path: string) => {
-    const mobileIdx = getMobileActiveIndex(path)
-    if (mobileIdx === -1) return -1
-    return mobileIdx + 1 // Offset by 1 since logo is at index 0
-  }, [getMobileActiveIndex])
-
-  // Desktop active index (for pill animation)
-  const desktopActiveIndex = getDesktopActiveIndex(pathname)
-
-  // Update pill position with fluid spring animation (desktop)
-  const updatePillPosition = useCallback((index: number) => {
-    // If index is -1 (unknown page), hide the pill by moving it off-screen
-    if (index === -1) {
-      setPillPosition({ x: -9999, width: 0 })
-      return
+  // Bounce spring animation on tab change
+  useEffect(() => {
+    if (activeIndex !== -1 && prevIndexRef.current !== -1 && prevIndexRef.current !== activeIndex) {
+      setIsBouncing(true)
+      const timer = setTimeout(() => setIsBouncing(false), 450)
+      prevIndexRef.current = activeIndex
+      return () => clearTimeout(timer)
     }
+    prevIndexRef.current = activeIndex
+  }, [activeIndex])
 
-    if (!navRef.current || !linkRefs.current[index]) return
-
-    const nav = navRef.current
-    const link = linkRefs.current[index]
-    if (!link) return
-
-    const navRect = nav.getBoundingClientRect()
-    const linkRect = link.getBoundingClientRect()
-
-    const x = linkRect.left - navRect.left
-    const width = linkRect.width
-
-    setIsPillAnimating(true)
-    setPillPosition({ x, width })
-
-    // Trigger reflow for spring animation
-    requestAnimationFrame(() => {
-      setTimeout(() => setIsPillAnimating(false), 400)
-    })
-  }, [])
-
-  // Update mobile pill position
-  const updateMobilePillPosition = useCallback((index: number) => {
-    // If index is -1 (unknown page), hide the pill
-    if (index === -1) {
-      setMobilePillPosition(-9999)
-      return
-    }
-
-    if (!mobileNavRef.current || !mobileLinkRefs.current[index]) return
-
-    const nav = mobileNavRef.current
-    const link = mobileLinkRefs.current[index]
-    if (!link) return
-
-    const navRect = nav.getBoundingClientRect()
-    const linkRect = link.getBoundingClientRect()
-
-    const x = linkRect.left - navRect.left
-    setMobilePillPosition(x)
-  }, [])
-
-  // Initialize pill position on mount
+  // Scroll detection
   useEffect(() => {
-    isMounted.current = true
-    const desktopIdx = getDesktopActiveIndex(pathname)
-    const mobileIdx = getMobileActiveIndex(pathname)
-    setActiveIndex(mobileIdx)
-
-    // Defer to after first render for proper measurements
-    requestAnimationFrame(() => {
-      updatePillPosition(desktopIdx)
-      updateMobilePillPosition(mobileIdx)
-    })
-  }, [getDesktopActiveIndex, getMobileActiveIndex, updatePillPosition, updateMobilePillPosition])
-
-  // Update pill positions on pathname change
-  useEffect(() => {
-    if (!isMounted.current) return
-
-    const desktopIdx = getDesktopActiveIndex(pathname)
-    const mobileIdx = getMobileActiveIndex(pathname)
-    setActiveIndex(mobileIdx)
-
-    requestAnimationFrame(() => {
-      updatePillPosition(desktopIdx)
-      updateMobilePillPosition(mobileIdx)
-    })
-  }, [pathname, getDesktopActiveIndex, getMobileActiveIndex, updatePillPosition, updateMobilePillPosition])
-
-  // Desktop active link helper
-  const isActive = (href: string) =>
-    href === '/' ? pathname === '/' : pathname.startsWith(href)
-
-  // Check if current page is a known nav page
-  const isKnownPage = mobileActiveIndex !== -1
-
-  // Scroll effect
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 60)
+    const onScroll = () => setIsScrolled(window.scrollY > 40)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  // Lock body scroll when drawer open
-  useEffect(() => {
-    document.body.style.overflow = isDrawerOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [isDrawerOpen])
-
-  // Focus search input when opened
+  // Focus search input on open
   useEffect(() => {
     if (isSearchOpen) {
       requestAnimationFrame(() => searchInputRef.current?.focus())
@@ -178,7 +75,7 @@ export const Navbar = () => {
     }
   }, [isSearchOpen])
 
-  // Keyboard shortcut ⌘K / Ctrl+K
+  // ⌘K / Ctrl+K shortcut
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -187,18 +84,11 @@ export const Navbar = () => {
       }
       if (e.key === 'Escape') {
         setIsSearchOpen(false)
-        setIsDrawerOpen(false)
       }
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
-
-  // Handle link click for pill animation
-  const handleLinkClick = (index: number) => {
-    setActiveIndex(index)
-    updatePillPosition(index)
-  }
 
   return (
     <>
@@ -207,190 +97,191 @@ export const Navbar = () => {
       ══════════════════════════════════════ */}
       <header className="hidden md:flex fixed top-5 inset-x-0 z-50 justify-center pointer-events-none select-none">
         <nav
-          ref={navRef}
           className={cn(
-            "pointer-events-auto relative flex items-center gap-1 px-2 h-11 rounded-full",
+            "pointer-events-auto relative flex items-center p-1 rounded-full",
             "glass nav-pill-glow",
             "transition-all duration-300 ease-out",
-            isScrolled ? "scale-[0.98] opacity-90" : "scale-100 opacity-100"
+            isScrolled ? "scale-[0.98] shadow-lg" : "scale-100"
           )}
+          style={{ height: '46px' }}
           aria-label="Main navigation"
         >
-          {/* Fluid Liquid Pill - iOS 26 Style (only show on known pages) */}
-          {isKnownPage && (
-            <div
-              className={cn(
-                "absolute top-1 bottom-1 rounded-full pointer-events-none z-0 pill-spring",
-                "bg-primary shadow-[0_8px_24px_oklch(0.6_0.22_250_/0.4),0_2px_8px_oklch(0.6_0.22_250_/0.3)]",
-                isPillAnimating && "animate-pill-bounce"
-              )}
-              style={{
-                transform: `translateX(${pillPosition.x}px)`,
-                width: pillPosition.width,
-                ['--pill-x']: `${pillPosition.x}px`,
-              } as React.CSSProperties}
-              aria-hidden="true"
-            >
-              {/* Inner glow effect */}
-              <div className="absolute inset-0 rounded-full" style={{
-                background: 'linear-gradient(to bottom, oklch(1 0 0 / 0.25), oklch(0 0 0 / 0%))',
-                boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.3), inset 0 -1px 0 oklch(0 0 0 / 0.1)',
-              }} />
-            </div>
-          )}
+          {/* 1. Base Layer: Inactive Icons & Links */}
+          <div className="relative flex items-center h-full z-10">
+            {navTabs.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className="flex items-center justify-center gap-1.5 h-full text-xs font-medium lowercase text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  style={{ width: `${DESKTOP_TAB_WIDTH}px` }}
+                >
+                  <Icon size={15} weight="regular" aria-hidden />
+                  <span>{tab.label}</span>
+                </Link>
+              )
+            })}
+          </div>
 
-          {/* Logo / Monogram */}
-          <Link
-            href="/"
-            onClick={() => handleLinkClick(0)}
-            ref={(el) => { linkRefs.current[0] = el }}
-            className="relative z-10 flex items-center justify-center size-7 rounded-full bg-transparent text-foreground font-bold text-xs mr-1 hover:scale-110 transition-transform"
-            aria-label="Home"
+          {/* 2. Top Mask Layer: Solid Liquid Sliding Pill Aperture */}
+          <div
+            className={cn(
+              "absolute top-1 bottom-1 overflow-hidden pointer-events-none rounded-full z-20",
+              "transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+              "bg-primary text-primary-foreground shadow-[0_4px_16px_oklch(0.6_0.22_250_/0.4),0_1px_4px_oklch(0.6_0.22_250_/0.3)]",
+              isBouncing && "scale-x-110 scale-y-95",
+              activeIndex === -1 ? "opacity-0" : "opacity-100"
+            )}
+            style={{
+              left: `${(activeIndex === -1 ? 0 : activeIndex) * DESKTOP_TAB_WIDTH + DESKTOP_PADDING}px`,
+              width: `${DESKTOP_TAB_WIDTH}px`,
+              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 4px 16px oklch(0.6 0.22 250 / 0.35)',
+            }}
+            aria-hidden="true"
           >
-            <span className="size-4 rounded-full bg-primary" aria-hidden />
-          </Link>
+            {/* Inner mirrored container that reveals glowing white active icon & text */}
+            <div
+              className="flex items-center h-full absolute top-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+              style={{
+                left: `-${(activeIndex === -1 ? 0 : activeIndex) * DESKTOP_TAB_WIDTH}px`,
+                width: `${navTabs.length * DESKTOP_TAB_WIDTH}px`,
+              }}
+            >
+              {navTabs.map((tab) => {
+                const Icon = tab.icon
+                return (
+                  <div
+                    key={`active-${tab.href}`}
+                    className="flex items-center justify-center gap-1.5 h-full text-white font-semibold text-xs lowercase"
+                    style={{ width: `${DESKTOP_TAB_WIDTH}px` }}
+                  >
+                    <Icon size={15} weight="fill" className="text-white drop-shadow-xs" aria-hidden />
+                    <span className="drop-shadow-xs">{tab.label}</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
 
           {/* Separator */}
-          <span className="relative z-10 w-px h-5 bg-border mx-1 opacity-60" aria-hidden />
-
-          {/* Nav Links with Icons */}
-          {desktopLinks.map(({ href, label, icon: Icon }, idx) => {
-            const active = isActive(href) && isKnownPage
-            const refIndex = idx + 1 // Offset by 1 since logo is at index 0
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={() => handleLinkClick(refIndex)}
-                ref={(el) => { linkRefs.current[refIndex] = el }}
-                className={cn(
-                  "relative z-10 flex items-center gap-1.5 px-3.5 h-9 rounded-full text-sm font-medium transition-all duration-200",
-                  active
-                    ? "text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-                aria-current={active ? 'page' : undefined}
-              >
-                <Icon size={14} weight={active ? "fill" : "regular"} aria-hidden />
-                <span className="lowercase">{label}</span>
-              </Link>
-            )
-          })}
-
-          {/* Separator */}
-          <span className="relative z-10 w-px h-5 bg-border mx-1 opacity-60" aria-hidden />
+          <span className="relative z-10 w-px h-5 bg-border/60 mx-1" aria-hidden />
 
           {/* Search Button */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="relative z-10 flex items-center gap-1.5 px-3 h-9 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all duration-200 group"
+            className="relative z-10 flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all duration-200 group"
             aria-label="Search (⌘K)"
           >
-            <MagnifyingGlass size={14} weight="bold" />
-            <span className="text-xs opacity-60 group-hover:opacity-100 transition-opacity">⌘K</span>
+            <MagnifyingGlass size={14} weight="bold" aria-hidden />
+            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-muted border border-border/60 font-mono text-muted-foreground group-hover:text-foreground transition-colors">
+              ⌘K
+            </span>
           </button>
         </nav>
       </header>
 
       {/* ══════════════════════════════════════
-          MOBILE — Bottom Pill Nav (iOS 26 Style)
+          MOBILE — Floating Bottom Pill Nav (iOS 26 Style)
+          Centered, glass rounded-full pill, no background rectangle
       ══════════════════════════════════════ */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom select-none">
-        {/* Gradient fade above the bar */}
-        <div
-          className="absolute inset-x-0 -top-8 h-8 pointer-events-none"
-          style={{
-            background: 'linear-gradient(to top, var(--background) 0%, transparent 100%)',
-          }}
-          aria-hidden
-        />
+      <div className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 select-none">
         <nav
-          ref={mobileNavRef}
           className={cn(
-            "relative flex items-center justify-around px-3 pb-safe-or-2",
-            "glass",
-            isKnownPage ? "border-t border-border/40" : "border-t border-border/40",
+            "relative flex items-center p-1 rounded-full",
+            "glass shadow-[0_12px_36px_rgba(0,0,0,0.16)] dark:shadow-[0_12px_36px_rgba(0,0,0,0.7)]",
+            "border border-border/60 dark:border-white/10"
           )}
-          style={{
-            paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-            margin: '0 12px 8px 12px',
-            borderRadius: '9999px',
-          }}
+          style={{ height: '52px' }}
           aria-label="Mobile navigation"
         >
-          {/* Mobile fluid pill - iOS 26 liquid glass */}
-          {isKnownPage && (
-            <div
-              className={cn(
-                "absolute top-1.5 bottom-1.5 rounded-full pointer-events-none z-0 pill-spring",
-                "bg-primary/20 shadow-[0_4px_16px_oklch(0.6_0.22_250_/0.35),0_1px_4px_oklch(0.6_0.22_250_/0.25)]",
-              )}
-              style={{
-                transform: `translateX(${mobilePillPosition}px)`,
-                ['--pill-x']: `${mobilePillPosition}px`,
-              } as React.CSSProperties}
-              aria-hidden
+          {/* Base Layer: Inactive Tabs */}
+          <div className="relative flex items-center h-full z-10">
+            {navTabs.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <Link
+                  key={tab.href}
+                  href={tab.href}
+                  className="flex flex-col items-center justify-center gap-0.5 h-full text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  style={{ width: `${MOBILE_TAB_WIDTH}px` }}
+                >
+                  <Icon size={19} weight="regular" aria-hidden />
+                  <span className="text-[10px] font-medium tracking-tight lowercase">
+                    {tab.label}
+                  </span>
+                </Link>
+              )
+            })}
+
+            {/* Mobile Search Button */}
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="flex flex-col items-center justify-center gap-0.5 h-full text-muted-foreground hover:text-foreground transition-colors duration-200"
+              style={{ width: `${MOBILE_TAB_WIDTH}px` }}
+              aria-label="Search"
             >
-              <div className="absolute inset-0 rounded-full" style={{
-                background: 'linear-gradient(to bottom, oklch(1 0 0 / 0.25), oklch(0 0 0 / 0%))',
-                boxShadow: 'inset 0 1px 0 oklch(1 0 0 / 0.2), inset 0 -1px 0 oklch(0 0 0 / 0.1)',
-              }} />
-            </div>
-          )}
+              <MagnifyingGlass size={19} weight="regular" aria-hidden />
+              <span className="text-[10px] font-medium tracking-tight lowercase">search</span>
+            </button>
+          </div>
 
-          {mobileTabs.map(({ href, label, icon: Icon }, idx) => {
-            const active = idx === mobileActiveIndex && isKnownPage
-            return (
-              <Link
-                key={href}
-                href={href}
-                ref={(el) => { mobileLinkRefs.current[idx] = el }}
-                className={cn(
-                  "relative z-10 flex flex-col items-center gap-0.5 min-w-0 flex-1 py-2.5 rounded-full transition-all duration-200",
-                  active ? "text-primary" : "text-muted-foreground hover:text-foreground",
-                )}
-                aria-current={active ? 'page' : undefined}
-              >
-                <Icon
-                  size={22}
-                  weight={active ? "fill" : "regular"}
-                  aria-hidden
-                />
-                <span className={cn(
-                  "text-[10px] font-medium tracking-tight lowercase transition-all",
-                  active ? "opacity-100 font-semibold" : "opacity-70"
-                )}>
-                  {label}
-                </span>
-              </Link>
-            )
-          })}
-
-          {/* Search tab */}
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            ref={(el) => { mobileLinkRefs.current[5] = el }}
-            className="relative z-10 flex flex-col items-center gap-0.5 min-w-0 flex-1 py-2.5 rounded-full text-muted-foreground hover:text-foreground transition-all"
-            aria-label="Search"
+          {/* Top Mask Layer: Mobile Sliding Liquid Pill */}
+          <div
+            className={cn(
+              "absolute top-1 bottom-1 overflow-hidden pointer-events-none rounded-full z-20",
+              "transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+              "bg-primary text-primary-foreground shadow-[0_4px_16px_oklch(0.6_0.22_250_/0.4)]",
+              isBouncing && "scale-x-110 scale-y-95",
+              activeIndex === -1 ? "opacity-0" : "opacity-100"
+            )}
+            style={{
+              left: `${(activeIndex === -1 ? 0 : activeIndex) * MOBILE_TAB_WIDTH + MOBILE_PADDING}px`,
+              width: `${MOBILE_TAB_WIDTH}px`,
+              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 4px 16px oklch(0.6 0.22 250 / 0.35)',
+            }}
+            aria-hidden="true"
           >
-            <MagnifyingGlass size={22} weight="regular" aria-hidden />
-            <span className="text-[10px] font-medium tracking-tight lowercase opacity-70">search</span>
-          </button>
+            {/* Inner container revealing glowing white icon & text */}
+            <div
+              className="flex items-center h-full absolute top-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+              style={{
+                left: `-${(activeIndex === -1 ? 0 : activeIndex) * MOBILE_TAB_WIDTH}px`,
+                width: `${navTabs.length * MOBILE_TAB_WIDTH}px`,
+              }}
+            >
+              {navTabs.map((tab) => {
+                const Icon = tab.icon
+                return (
+                  <div
+                    key={`active-mobile-${tab.href}`}
+                    className="flex flex-col items-center justify-center gap-0.5 h-full text-white font-semibold"
+                    style={{ width: `${MOBILE_TAB_WIDTH}px` }}
+                  >
+                    <Icon size={19} weight="fill" className="text-white drop-shadow-xs" aria-hidden />
+                    <span className="text-[10px] font-bold tracking-tight lowercase text-white drop-shadow-xs">
+                      {tab.label}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </nav>
       </div>
 
       {/* ══════════════════════════════════════
-          SEARCH OVERLAY (shared)
+          SEARCH OVERLAY (⌘K)
       ══════════════════════════════════════ */}
       {isSearchOpen && (
         <div
-          className="fixed inset-0 z-[200] flex items-start justify-center pt-[12vh] px-4 search-overlay animate-fade-in"
-          style={{ background: 'oklch(from var(--background) l c h / 0.6)' }}
+          className="fixed inset-0 z-[200] flex items-start justify-center pt-[10vh] px-4 search-overlay animate-fade-in"
+          style={{ background: 'oklch(from var(--background) l c h / 0.65)' }}
           onClick={(e) => { if (e.target === e.currentTarget) setIsSearchOpen(false) }}
         >
           <div className="w-full max-w-xl animate-scale-up">
-            {/* Search box */}
-            <div className="card-surface rounded-[24px] overflow-hidden grain relative">
+            <div className="card-surface rounded-[24px] overflow-hidden grain relative shadow-2xl border border-border/60">
+              {/* Search input bar */}
               <div className="flex items-center gap-3 px-5 py-4 border-b border-border/40">
                 <MagnifyingGlass size={18} weight="bold" className="text-muted-foreground shrink-0" aria-hidden />
                 <input
@@ -405,7 +296,7 @@ export const Navbar = () => {
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="text-muted-foreground hover:text-foreground transition-colors"
+                    className="text-muted-foreground hover:text-foreground transition-colors p-1"
                     aria-label="Clear search"
                   >
                     <X size={16} weight="bold" />
@@ -416,20 +307,22 @@ export const Navbar = () => {
                 </kbd>
               </div>
 
-              {/* Quick links */}
+              {/* Quick links when empty */}
               {!searchQuery && (
                 <div className="p-3">
-                  <p className="text-[11px] font-semibold text-muted-foreground/60 uppercase tracking-widest px-2 pb-2">Quick Links</p>
+                  <p className="text-[10px] font-bold text-muted-foreground/50 uppercase tracking-widest px-3 pb-2 pt-1">
+                    Quick Navigation
+                  </p>
                   <div className="flex flex-col gap-0.5">
-                    {desktopLinks.map(({ href, label, icon: Icon }) => (
+                    {navTabs.map(({ href, label, icon: Icon }) => (
                       <Link
                         key={href}
                         href={href}
                         onClick={() => setIsSearchOpen(false)}
                         className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted/80 transition-colors group"
                       >
-                        <span className="size-7 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground group-hover:text-foreground transition-colors">
-                          <Icon size={13} weight="bold" />
+                        <span className="size-7 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
+                          <Icon size={14} weight="bold" />
                         </span>
                         <span className="text-sm font-medium text-foreground lowercase">{label}</span>
                         <span className="ml-auto text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">↵</span>
@@ -441,13 +334,13 @@ export const Navbar = () => {
 
               {/* Search results */}
               {searchQuery && (
-                <div className="p-3">
+                <div className="p-3 max-h-[60vh] overflow-y-auto">
                   <SearchResults query={searchQuery} onClose={() => setIsSearchOpen(false)} />
                 </div>
               )}
 
-              <div className="flex items-center justify-between px-5 py-3 border-t border-border/30 text-[11px] text-muted-foreground/60">
-                <span>↑↓ navigate · ↵ open · esc close</span>
+              <div className="flex items-center justify-between px-5 py-3 border-t border-border/30 text-[11px] text-muted-foreground/70 bg-muted/20">
+                <span>↑↓ navigate · ↵ select · esc close</span>
                 <span>⌘K</span>
               </div>
             </div>
@@ -458,24 +351,24 @@ export const Navbar = () => {
   )
 }
 
-/* ─── Inline search result component ─── */
 function SearchResults({ query, onClose }: { query: string; onClose: () => void }) {
   const q = query.toLowerCase().trim()
 
   const allPages = [
-    { href: '/',         title: 'Home',           description: 'Design engineer & frontend architecture' },
-    { href: '/about',    title: 'About',           description: 'Background, philosophy & tech stack' },
-    { href: '/projects', title: 'Projects',        description: 'Selected works & case studies' },
-    { href: '/blog',     title: 'Blog',            description: 'Thoughts, essays & tutorials' },
-    { href: '/contact',  title: 'Contact',         description: 'Get in touch for projects & collaborations' },
-    { href: '/now',      title: 'Now',             description: 'What I\'m currently working on' },
-    { href: '/projects/ios-sleep-tracker',      title: 'sleep. — iOS Tracker',       description: 'Minimal SwiftUI sleep health app with physics gestures' },
-    { href: '/projects/oklch-palette-builder', title: 'OKLCH Palette Builder',       description: 'Visual color palette tool using the OKLCH color space' },
-    { href: '/projects/portfolio',             title: 'Portfolio Website',           description: 'This very site — Next.js, Tailwind, Nextra' },
-    { href: '/blog/crafting-sleek-interfaces', title: 'Crafting Sleek Interfaces',   description: 'Design aesthetics, typography, and high-fidelity web experiences' },
-    { href: '/blog/hello-world',               title: 'Hello, World',                description: 'First post on the new blog' },
-    { href: '/blog/oklch-color-future',        title: 'OKLCH is the Future of Color', description: 'Why OKLCH produces more consistent, accessible palettes' },
-    { href: '/blog/perfect-button',            title: 'The Anatomy of a Perfect Button', description: 'Deep dive into premium button design' },
+    { href: '/',         title: 'home',           description: 'Design engineer & frontend architecture' },
+    { href: '/about',    title: 'about',          description: 'Background, philosophy & tech stack' },
+    { href: '/projects', title: 'projects',       description: 'Selected works & case studies' },
+    { href: '/blog',     title: 'blog',           description: 'Thoughts, essays & technical writings' },
+    { href: '/contact',  title: 'contact',        description: 'Get in touch for projects & collaborations' },
+    { href: '/now',      title: 'now',            description: 'What I am currently focused on' },
+    { href: '/projects/ios-sleep-tracker',      title: 'sleep. — iOS tracker',       description: 'Minimal SwiftUI sleep health app with physics gestures' },
+    { href: '/projects/oklch-palette-builder', title: 'oklch color builder',         description: 'Interactive color palette tool using OKLCH color space' },
+    { href: '/projects/design-system-kit',     title: 'design system kit',           description: 'Open source design tokens and component kit for Next.js' },
+    { href: '/projects/portfolio',             title: 'portfolio website',           description: 'Tactile, high-performance portfolio built with Nextra & Tailwind' },
+    { href: '/blog/crafting-sleek-interfaces', title: 'crafting sleek interfaces',   description: 'Design aesthetics, typography, and high-fidelity web experiences' },
+    { href: '/blog/oklch-color-future',        title: 'oklch is the future of web color', description: 'Why OKLCH produces more consistent palettes than HSL' },
+    { href: '/blog/perfect-button',            title: 'the anatomy of a perfect button', description: 'What makes a button feel premium: padding, physics, and light' },
+    { href: '/blog/hello-world',               title: 'hello world',                 description: 'First post on the new blog' },
   ]
 
   const results = allPages.filter(
@@ -486,7 +379,7 @@ function SearchResults({ query, onClose }: { query: string; onClose: () => void 
     return (
       <div className="py-8 text-center text-muted-foreground text-sm">
         <p>No results for <strong className="text-foreground">"{query}"</strong></p>
-        <p className="text-xs mt-1 opacity-60">Try a different search term</p>
+        <p className="text-xs mt-1 opacity-60">Try searching for "design", "swiftui", "oklch", or "react"</p>
       </div>
     )
   }
@@ -504,8 +397,8 @@ function SearchResults({ query, onClose }: { query: string; onClose: () => void 
             <MagnifyingGlass size={13} weight="bold" />
           </span>
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-semibold text-foreground leading-tight">{page.title}</span>
-            <span className="text-xs text-muted-foreground leading-tight truncate">{page.description}</span>
+            <span className="text-sm font-semibold text-foreground leading-tight lowercase">{page.title}</span>
+            <span className="text-xs text-muted-foreground leading-tight truncate mt-0.5 lowercase">{page.description}</span>
           </div>
           <span className="ml-auto text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0">↵</span>
         </Link>
@@ -513,4 +406,3 @@ function SearchResults({ query, onClose }: { query: string; onClose: () => void 
     </div>
   )
 }
-

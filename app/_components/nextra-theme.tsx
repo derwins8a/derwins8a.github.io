@@ -5,6 +5,7 @@ import type { FC, ReactNode } from 'react'
 import { usePathname } from 'next/navigation'
 import { Footer } from './footer'
 import { Navbar } from './navbar'
+import { GlassCursor } from '@/components/glass-cursor'
 
 export const NextraTheme: FC<{
   children: ReactNode
@@ -18,21 +19,27 @@ export const NextraTheme: FC<{
       {/* Background mesh gradient */}
       <div className="page-gradient" aria-hidden />
 
+      {/* Apple-style Glass Refraction Cursor */}
+      <GlassCursor />
+
+      {/* Floating Centered Pill Navbar (Desktop) & Floating Bottom Pill (Mobile) */}
       <Navbar />
 
-      {/* Main content — padded for desktop pill nav top + mobile bottom tab bar */}
+      {/* Main content
+          Mobile: compact top padding (no top bar exists on mobile, so no dead space)
+          Desktop:
+            - Home & Contact: md:pt-20 (compact for hero)
+            - Inner Pages: md:pt-28 lg:pt-32 (generous breathing room under top pill)
+      */}
       <main className={`flex-grow max-w-4xl mx-auto w-full px-5 md:px-6 transition-all duration-300 ${
         isHomeOrContact
-          ? 'pt-20 md:pt-16 pb-16 md:pb-12'
-          : 'pt-28 md:pt-24 pb-16 md:pb-12'
+          ? 'pt-4 sm:pt-6 md:pt-20 pb-12 md:pb-16'
+          : 'pt-5 sm:pt-6 md:pt-28 lg:pt-32 pb-12 md:pb-16'
       }`}>
         {children}
       </main>
 
       <Footer />
-
-      {/* Mobile bottom navbar spacer - prevents theme toggle occlusion */}
-      <div className="md:hidden h-20" aria-hidden />
     </div>
   )
 }

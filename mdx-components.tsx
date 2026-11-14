@@ -250,14 +250,17 @@ export function useMDXComponents(components: MDXComponents = {}): MDXComponents 
           <article className="w-full text-left">
             {/* Article header */}
             <header className="mb-10 pb-8 border-b border-border/30 flex flex-col gap-5">
-              {/* Back link */}
-              <Link
-                href={isBlog ? "/blog" : "/projects"}
-                className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5 w-fit lowercase"
-              >
-                <ArrowLeft size={13} weight="bold" aria-hidden />
-                {isBlog ? "back to all essays." : "back to all works."}
-              </Link>
+              {/* Back Pill Button */}
+              <div>
+                <Link
+                  href={isBlog ? "/blog" : "/projects"}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-muted hover:bg-primary hover:text-primary-foreground border border-border/60 shadow-xs transition-all w-fit lowercase active:scale-95 text-foreground/80 hover:border-primary/40 group"
+                  aria-label={isBlog ? "Back to essays" : "Back to works"}
+                >
+                  <ArrowLeft size={13} weight="bold" className="transition-transform group-hover:-translate-x-0.5" aria-hidden />
+                  <span>{isBlog ? "back to essays" : "back to works"}</span>
+                </Link>
+              </div>
 
               {/* Title */}
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tighter text-foreground leading-[1.05] lowercase">
