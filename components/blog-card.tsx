@@ -14,8 +14,8 @@ export function BlogCard({ article }: { article: StructuredPage }) {
     : null
 
   return (
-    <article className="scroll-slide-up flex flex-col h-full card-surface grain relative rounded-[24px] p-5 transition-all duration-300 group select-none overflow-hidden">
-      <Link href={article.route} className="flex flex-col h-full gap-3">
+    <article className="scroll-slide-up flex flex-col h-full card-surface grain relative rounded-[24px] p-4 transition-all duration-300 group select-none overflow-hidden">
+      <Link href={article.route} className="flex flex-col h-full gap-2.5">
 
         {/* Date + read time */}
         {formattedDate && (
@@ -40,7 +40,7 @@ export function BlogCard({ article }: { article: StructuredPage }) {
         )}
 
         {/* Bottom row */}
-        <div className="flex items-center justify-between gap-2 mt-auto pt-3 border-t border-border/30">
+        <div className="flex items-center justify-between gap-2 mt-auto pt-2 border-t border-border/30">
           <div className="flex flex-wrap gap-1.5">
             {fm.tags && fm.tags.slice(0, 2).map((tag: string) => (
               <span key={tag} className="chip">

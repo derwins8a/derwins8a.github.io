@@ -247,7 +247,7 @@ export const Navbar = () => {
             className="relative z-10 flex items-center justify-center size-7 rounded-full bg-transparent text-foreground font-bold text-xs mr-1 hover:scale-110 transition-transform"
             aria-label="Home"
           >
-            DO
+            <span className="size-4 rounded-full bg-primary" aria-hidden />
           </Link>
 
           {/* Separator */}

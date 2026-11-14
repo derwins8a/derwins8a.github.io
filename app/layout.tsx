@@ -22,7 +22,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: {
     default: 'Derwins Ochoa — Design Engineer',
-    template: '%s — Derwins Ochoa',
+    template: '%s',
   },
   description: 'Design engineer & frontend architect. Building tactile, high-performance web and mobile software for established brands and funded startups.',
   keywords: ['design engineer', 'frontend developer', 'iOS developer', 'Next.js', 'SwiftUI', 'React', 'TypeScript', 'Venezuela'],

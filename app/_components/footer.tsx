@@ -111,7 +111,7 @@ export const Footer = () => {
           <p className="text-xs text-muted-foreground/70 font-light lowercase flex items-center gap-1.5">
             © {new Date().getFullYear()} Derwins Ochoa · made with
             <Heart size={11} weight="fill" className="text-red-400 inline" aria-hidden />
-            in venezuela.
+            in Venezuela.
           </p>
           <ThemeToggle />
         </div>

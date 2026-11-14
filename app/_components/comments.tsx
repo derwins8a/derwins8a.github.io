@@ -5,26 +5,10 @@ import Giscus from '@giscus/react'
 import type { FC } from 'react'
 
 export const Comments: FC = () => {
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    const updateGiscusTheme = () => {
-      const isDark = document.documentElement.classList.contains('dark')
-      setTheme(isDark ? 'dark' : 'light')
-    }
-
-    updateGiscusTheme()
-
-    // Observe class changes on html
-    const observer = new MutationObserver(updateGiscusTheme)
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class', 'data-theme'],
-    })
-
-    return () => observer.disconnect()
   }, [])
 
   return (
@@ -50,7 +34,7 @@ export const Comments: FC = () => {
           reactionsEnabled="1"
           emitMetadata="0"
           inputPosition="top"
-          theme="https://derwins8a.github.io/giscus/ios-theme.css"
+          theme="preferred_color_scheme"
           lang="en"
           loading="lazy"
         />

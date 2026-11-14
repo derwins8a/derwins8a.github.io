@@ -48,7 +48,7 @@ export function ProjectCard({ project }: { project: StructuredPage }) {
         </div>
 
         {/* Content */}
-        <div className="flex flex-col flex-grow gap-2.5 p-4">
+        <div className="flex flex-col flex-grow gap-2 p-4">
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-base font-bold tracking-tight text-foreground group-hover:text-primary transition-colors leading-snug lowercase line-clamp-2">
               {fm.title || project.name}
@@ -68,7 +68,7 @@ export function ProjectCard({ project }: { project: StructuredPage }) {
           )}
 
           {fm.tags && fm.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-auto pt-2">
+            <div className="flex flex-wrap gap-1.5 mt-auto pt-1.5">
               {fm.tags.slice(0, 3).map((tag: string) => (
                 <span key={tag} className="chip">
                   {tag.toLowerCase()}
