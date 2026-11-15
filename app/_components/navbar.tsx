@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   House,
   User,
@@ -14,41 +14,37 @@ import {
 } from "@phosphor-icons/react"
 import { cn } from '@/lib/utils'
 
-const navTabs = [
-  { href: '/',         label: 'home',     icon: House },
-  { href: '/about',    label: 'about',    icon: User },
-  { href: '/projects', label: 'projects', icon: FolderSimple },
-  { href: '/blog',     label: 'blog',     icon: BookOpen },
-  { href: '/contact',  label: 'contact',  icon: PaperPlaneTilt },
+const tabs = [
+  { name: "home.", href: "/", icon: House },
+  { name: "about.", href: "/about", icon: User },
+  { name: "projects.", href: "/projects", icon: FolderSimple },
+  { name: "blog.", href: "/blog", icon: BookOpen },
+  { name: "contact.", href: "/contact", icon: PaperPlaneTilt },
 ]
-
-const DESKTOP_TAB_WIDTH = 96 // px per tab on desktop
-const DESKTOP_PADDING = 4    // container padding
-const MOBILE_TAB_WIDTH = 54  // px per tab on mobile
-const MOBILE_PADDING = 4     // container padding
 
 export const Navbar = () => {
   const pathname = usePathname()
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [isBouncing, setIsBouncing] = useState(false)
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [isBouncing, setIsBouncing] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const prevIndexRef = useRef<number>(-1)
 
-  // Determine active index
-  const getActiveIndex = useCallback((path: string) => {
-    if (path === '/') return 0
-    if (path === '/about') return 1
-    if (path.startsWith('/projects')) return 2
-    if (path.startsWith('/blog')) return 3
-    if (path.startsWith('/contact')) return 4
-    return -1
+  // Determine current active index (-1 for unknown pages so the lens smoothly hides)
+  let activeIndex = -1
+  if (pathname === "/") activeIndex = 0
+  else if (pathname === "/about") activeIndex = 1
+  else if (pathname.startsWith("/projects")) activeIndex = 2
+  else if (pathname.startsWith("/blog")) activeIndex = 3
+  else if (pathname.startsWith("/contact")) activeIndex = 4
+
+  const prevIndexRef = useRef<number>(activeIndex)
+
+  useEffect(() => {
+    setMounted(true)
   }, [])
 
-  const activeIndex = getActiveIndex(pathname)
-
-  // Bounce spring animation on tab change
+  // Bounciness on tab change
   useEffect(() => {
     if (activeIndex !== -1 && prevIndexRef.current !== -1 && prevIndexRef.current !== activeIndex) {
       setIsBouncing(true)
@@ -58,13 +54,6 @@ export const Navbar = () => {
     }
     prevIndexRef.current = activeIndex
   }, [activeIndex])
-
-  // Scroll detection
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 40)
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   // Focus search input on open
   useEffect(() => {
@@ -90,184 +79,200 @@ export const Navbar = () => {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
+  // Desktop dimensions
+  const desktopTabWidth = 76 // px per tab on desktop
+  const desktopPadding = 4
+
+  // Mobile dimensions
+  const mobileTabWidth = 56  // px per tab on mobile
+  const mobilePadding = 4
+
   return (
     <>
       {/* ══════════════════════════════════════
-          DESKTOP — Centered Pill Nav with iOS 26 Fluid Liquid Animation
+          DESKTOP — Centered Pill Nav with iOS 26 Liquid Magnifier Animation
       ══════════════════════════════════════ */}
       <header className="hidden md:flex fixed top-5 inset-x-0 z-50 justify-center pointer-events-none select-none">
-        <nav
-          className={cn(
-            "pointer-events-auto relative flex items-center p-1 rounded-full",
-            "glass nav-pill-glow",
-            "transition-all duration-300 ease-out",
-            isScrolled ? "scale-[0.98] shadow-lg" : "scale-100"
-          )}
-          style={{ height: '46px' }}
-          aria-label="Main navigation"
-        >
-          {/* 1. Base Layer: Inactive Icons & Links */}
-          <div className="relative flex items-center h-full z-10">
-            {navTabs.map((tab) => {
-              const Icon = tab.icon
-              return (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className="flex items-center justify-center gap-1.5 h-full text-xs font-medium lowercase text-muted-foreground hover:text-foreground transition-colors duration-200"
-                  style={{ width: `${DESKTOP_TAB_WIDTH}px` }}
-                >
-                  <Icon size={15} weight="regular" aria-hidden />
-                  <span>{tab.label}</span>
-                </Link>
-              )
-            })}
-          </div>
-
-          {/* 2. Top Mask Layer: Solid Liquid Sliding Pill Aperture */}
-          <div
-            className={cn(
-              "absolute top-1 bottom-1 overflow-hidden pointer-events-none rounded-full z-20",
-              "transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-              "bg-primary text-primary-foreground shadow-[0_4px_16px_oklch(0.6_0.22_250_/0.4),0_1px_4px_oklch(0.6_0.22_250_/0.3)]",
-              isBouncing && "scale-x-110 scale-y-95",
-              activeIndex === -1 ? "opacity-0" : "opacity-100"
-            )}
+        <div className="pointer-events-auto flex items-center gap-2">
+          <nav
+            className="relative flex items-center p-1 rounded-full bg-background/80 dark:bg-[#1c1c1e]/90 backdrop-blur-2xl border border-border/60 dark:border-white/[0.12] shadow-[0_10px_35px_rgba(0,0,0,0.12)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.8)] transition-colors duration-300"
             style={{
-              left: `${(activeIndex === -1 ? 0 : activeIndex) * DESKTOP_TAB_WIDTH + DESKTOP_PADDING}px`,
-              width: `${DESKTOP_TAB_WIDTH}px`,
-              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 4px 16px oklch(0.6 0.22 250 / 0.35)',
+              width: `${tabs.length * desktopTabWidth + desktopPadding * 2}px`,
+              height: "54px",
             }}
-            aria-hidden="true"
+            aria-label="Main navigation"
           >
-            {/* Inner mirrored container that reveals glowing white active icon & text */}
-            <div
-              className="flex items-center h-full absolute top-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-              style={{
-                left: `-${(activeIndex === -1 ? 0 : activeIndex) * DESKTOP_TAB_WIDTH}px`,
-                width: `${navTabs.length * DESKTOP_TAB_WIDTH}px`,
-              }}
-            >
-              {navTabs.map((tab) => {
+            {/* 1. Base Layer: Inactive Muted Icons & Links */}
+            <div className="flex items-center w-full h-full relative z-10">
+              {tabs.map((tab) => {
                 const Icon = tab.icon
                 return (
-                  <div
-                    key={`active-${tab.href}`}
-                    className="flex items-center justify-center gap-1.5 h-full text-white font-semibold text-xs lowercase"
-                    style={{ width: `${DESKTOP_TAB_WIDTH}px` }}
+                  <Link
+                    key={tab.href}
+                    href={tab.href}
+                    className="flex flex-col items-center justify-center gap-0.5 h-full transition-colors text-muted-foreground dark:text-[#8e8e93] hover:text-foreground dark:hover:text-white"
+                    style={{ width: `${desktopTabWidth}px` }}
                   >
-                    <Icon size={15} weight="fill" className="text-white drop-shadow-xs" aria-hidden />
-                    <span className="drop-shadow-xs">{tab.label}</span>
-                  </div>
+                    <Icon size={20} weight="regular" />
+                    <span className="text-[10px] font-medium tracking-tight lowercase">
+                      {tab.name}
+                    </span>
+                  </Link>
                 )
               })}
             </div>
-          </div>
 
-          {/* Separator */}
-          <span className="relative z-10 w-px h-5 bg-border/60 mx-1" aria-hidden />
+            {/* 2. Top Mask Layer: Translucent Liquid Glass Lens (iOS 26 Style) */}
+            <div
+              className={cn(
+                "absolute top-1 bottom-1 overflow-hidden pointer-events-none rounded-full z-20",
+                "transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                "bg-black/[0.06] dark:bg-white/[0.14] backdrop-blur-xl",
+                "border border-black/10 dark:border-white/25",
+                isBouncing && "scale-x-[1.15] scale-y-[0.95]",
+                activeIndex === -1 ? "opacity-0 pointer-events-none" : "opacity-100"
+              )}
+              style={{
+                left: `${(activeIndex === -1 ? 0 : activeIndex) * desktopTabWidth + desktopPadding}px`,
+                width: `${desktopTabWidth}px`,
+                boxShadow:
+                  '0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 1.5px rgba(255, 255, 255, 0.5), inset 0 -1px 1px rgba(0, 0, 0, 0.15)',
+              }}
+              aria-hidden="true"
+            >
+              {/* Inner container with exact matching negative offset to reveal active colored glowing icon & text */}
+              <div
+                className="flex items-center h-full absolute top-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                style={{
+                  left: `-${(activeIndex === -1 ? 0 : activeIndex) * desktopTabWidth}px`,
+                  width: `${tabs.length * desktopTabWidth}px`,
+                }}
+              >
+                {tabs.map((tab) => {
+                  const Icon = tab.icon
+                  return (
+                    <div
+                      key={`active-${tab.href}`}
+                      className="flex flex-col items-center justify-center gap-0.5 h-full text-[#007AFF] dark:text-[#0a84ff]"
+                      style={{ width: `${desktopTabWidth}px` }}
+                    >
+                      <Icon
+                        size={20}
+                        weight="fill"
+                        className="text-[#007AFF] dark:text-[#0a84ff] drop-shadow-[0_0_8px_rgba(0,122,255,0.7)]"
+                      />
+                      <span className="text-[10px] font-bold tracking-tight lowercase text-[#007AFF] dark:text-[#0a84ff] drop-shadow-[0_0_6px_rgba(0,122,255,0.5)]">
+                        {tab.name}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </nav>
 
-          {/* Search Button */}
+          {/* Search Glass Button (Matching iOS 26 Circle as in reference image) */}
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="relative z-10 flex items-center gap-1.5 px-3 h-8 rounded-full text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-all duration-200 group"
+            className="size-[54px] rounded-full bg-background/80 dark:bg-[#1c1c1e]/90 backdrop-blur-2xl border border-border/60 dark:border-white/[0.12] shadow-[0_10px_35px_rgba(0,0,0,0.12)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.8)] flex items-center justify-center text-muted-foreground hover:text-foreground dark:text-[#8e8e93] dark:hover:text-white transition-all hover:scale-105 active:scale-95 group"
             aria-label="Search (⌘K)"
           >
-            <MagnifyingGlass size={14} weight="bold" aria-hidden />
-            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-muted border border-border/60 font-mono text-muted-foreground group-hover:text-foreground transition-colors">
-              ⌘K
-            </span>
+            <MagnifyingGlass size={20} weight="bold" />
           </button>
-        </nav>
+        </div>
       </header>
 
       {/* ══════════════════════════════════════
           MOBILE — Floating Bottom Pill Nav (iOS 26 Style)
-          Centered, glass rounded-full pill, no background rectangle
       ══════════════════════════════════════ */}
-      <div className="md:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 select-none">
-        <nav
-          className={cn(
-            "relative flex items-center p-1 rounded-full",
-            "glass shadow-[0_12px_36px_rgba(0,0,0,0.16)] dark:shadow-[0_12px_36px_rgba(0,0,0,0.7)]",
-            "border border-border/60 dark:border-white/10"
-          )}
-          style={{ height: '52px' }}
-          aria-label="Mobile navigation"
-        >
-          {/* Base Layer: Inactive Tabs */}
-          <div className="relative flex items-center h-full z-10">
-            {navTabs.map((tab) => {
-              const Icon = tab.icon
-              return (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className="flex flex-col items-center justify-center gap-0.5 h-full text-muted-foreground hover:text-foreground transition-colors duration-200"
-                  style={{ width: `${MOBILE_TAB_WIDTH}px` }}
-                >
-                  <Icon size={19} weight="regular" aria-hidden />
-                  <span className="text-[10px] font-medium tracking-tight lowercase">
-                    {tab.label}
-                  </span>
-                </Link>
-              )
-            })}
-
-            {/* Mobile Search Button */}
-            <button
-              onClick={() => setIsSearchOpen(true)}
-              className="flex flex-col items-center justify-center gap-0.5 h-full text-muted-foreground hover:text-foreground transition-colors duration-200"
-              style={{ width: `${MOBILE_TAB_WIDTH}px` }}
-              aria-label="Search"
-            >
-              <MagnifyingGlass size={19} weight="regular" aria-hidden />
-              <span className="text-[10px] font-medium tracking-tight lowercase">search</span>
-            </button>
-          </div>
-
-          {/* Top Mask Layer: Mobile Sliding Liquid Pill */}
-          <div
-            className={cn(
-              "absolute top-1 bottom-1 overflow-hidden pointer-events-none rounded-full z-20",
-              "transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
-              "bg-primary text-primary-foreground shadow-[0_4px_16px_oklch(0.6_0.22_250_/0.4)]",
-              isBouncing && "scale-x-110 scale-y-95",
-              activeIndex === -1 ? "opacity-0" : "opacity-100"
-            )}
+      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 select-none">
+        <div className="flex items-center gap-2">
+          <nav
+            className="relative flex items-center p-1 rounded-full bg-background/80 dark:bg-[#1c1c1e]/90 backdrop-blur-2xl border border-border/60 dark:border-white/[0.12] shadow-[0_10px_35px_rgba(0,0,0,0.14)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.8)] transition-colors duration-300"
             style={{
-              left: `${(activeIndex === -1 ? 0 : activeIndex) * MOBILE_TAB_WIDTH + MOBILE_PADDING}px`,
-              width: `${MOBILE_TAB_WIDTH}px`,
-              boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.3), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 4px 16px oklch(0.6 0.22 250 / 0.35)',
+              width: `${tabs.length * mobileTabWidth + mobilePadding * 2}px`,
+              height: "54px",
             }}
-            aria-hidden="true"
+            aria-label="Mobile navigation"
           >
-            {/* Inner container revealing glowing white icon & text */}
-            <div
-              className="flex items-center h-full absolute top-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
-              style={{
-                left: `-${(activeIndex === -1 ? 0 : activeIndex) * MOBILE_TAB_WIDTH}px`,
-                width: `${navTabs.length * MOBILE_TAB_WIDTH}px`,
-              }}
-            >
-              {navTabs.map((tab) => {
+            {/* 1. Base Layer: Inactive Tabs */}
+            <div className="flex items-center w-full h-full relative z-10">
+              {tabs.map((tab) => {
                 const Icon = tab.icon
                 return (
-                  <div
-                    key={`active-mobile-${tab.href}`}
-                    className="flex flex-col items-center justify-center gap-0.5 h-full text-white font-semibold"
-                    style={{ width: `${MOBILE_TAB_WIDTH}px` }}
+                  <Link
+                    key={tab.href}
+                    href={tab.href}
+                    className="flex flex-col items-center justify-center gap-0.5 h-full transition-colors text-muted-foreground dark:text-[#8e8e93] hover:text-foreground dark:hover:text-white"
+                    style={{ width: `${mobileTabWidth}px` }}
                   >
-                    <Icon size={19} weight="fill" className="text-white drop-shadow-xs" aria-hidden />
-                    <span className="text-[10px] font-bold tracking-tight lowercase text-white drop-shadow-xs">
-                      {tab.label}
+                    <Icon size={20} weight="regular" />
+                    <span className="text-[10px] font-medium tracking-tight lowercase">
+                      {tab.name}
                     </span>
-                  </div>
+                  </Link>
                 )
               })}
             </div>
-          </div>
-        </nav>
+
+            {/* 2. Top Mask Layer: Mobile Liquid Glass Lens */}
+            <div
+              className={cn(
+                "absolute top-1 bottom-1 overflow-hidden pointer-events-none rounded-full z-20",
+                "transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                "bg-black/[0.06] dark:bg-white/[0.14] backdrop-blur-xl",
+                "border border-black/10 dark:border-white/25",
+                isBouncing && "scale-x-[1.15] scale-y-[0.95]",
+                activeIndex === -1 ? "opacity-0 pointer-events-none" : "opacity-100"
+              )}
+              style={{
+                left: `${(activeIndex === -1 ? 0 : activeIndex) * mobileTabWidth + mobilePadding}px`,
+                width: `${mobileTabWidth}px`,
+                boxShadow:
+                  '0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 1.5px rgba(255, 255, 255, 0.5), inset 0 -1px 1px rgba(0, 0, 0, 0.15)',
+              }}
+              aria-hidden="true"
+            >
+              {/* Inner container with exact matching offset */}
+              <div
+                className="flex items-center h-full absolute top-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                style={{
+                  left: `-${(activeIndex === -1 ? 0 : activeIndex) * mobileTabWidth}px`,
+                  width: `${tabs.length * mobileTabWidth}px`,
+                }}
+              >
+                {tabs.map((tab) => {
+                  const Icon = tab.icon
+                  return (
+                    <div
+                      key={`active-mobile-${tab.href}`}
+                      className="flex flex-col items-center justify-center gap-0.5 h-full text-[#007AFF] dark:text-[#0a84ff]"
+                      style={{ width: `${mobileTabWidth}px` }}
+                    >
+                      <Icon
+                        size={20}
+                        weight="fill"
+                        className="text-[#007AFF] dark:text-[#0a84ff] drop-shadow-[0_0_8px_rgba(0,122,255,0.7)]"
+                      />
+                      <span className="text-[10px] font-bold tracking-tight lowercase text-[#007AFF] dark:text-[#0a84ff] drop-shadow-[0_0_6px_rgba(0,122,255,0.5)]">
+                        {tab.name}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </nav>
+
+          {/* Search Button for Mobile */}
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="size-[54px] rounded-full bg-background/80 dark:bg-[#1c1c1e]/90 backdrop-blur-2xl border border-border/60 dark:border-white/[0.12] shadow-[0_10px_35px_rgba(0,0,0,0.14)] dark:shadow-[0_10px_35px_rgba(0,0,0,0.8)] flex items-center justify-center text-muted-foreground hover:text-foreground dark:text-[#8e8e93] dark:hover:text-white transition-all active:scale-95"
+            aria-label="Search"
+          >
+            <MagnifyingGlass size={20} weight="bold" />
+          </button>
+        </div>
       </div>
 
       {/* ══════════════════════════════════════
@@ -314,7 +319,7 @@ export const Navbar = () => {
                     Quick Navigation
                   </p>
                   <div className="flex flex-col gap-0.5">
-                    {navTabs.map(({ href, label, icon: Icon }) => (
+                    {tabs.map(({ href, name, icon: Icon }) => (
                       <Link
                         key={href}
                         href={href}
@@ -324,7 +329,7 @@ export const Navbar = () => {
                         <span className="size-7 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground group-hover:text-primary transition-colors">
                           <Icon size={14} weight="bold" />
                         </span>
-                        <span className="text-sm font-medium text-foreground lowercase">{label}</span>
+                        <span className="text-sm font-medium text-foreground lowercase">{name}</span>
                         <span className="ml-auto text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">↵</span>
                       </Link>
                     ))}
